@@ -33,6 +33,11 @@ class ApiOutline(View):
         apiList = args['apiList']
         apis = genApis(apiList)
         for api in apis:
+            try:
+                ApiEntry.objects.get(path = api)
+                continue
+            except Exception, e:
+                pass
             entry = ApiEntry(path = api)
             entry.save()
 
@@ -48,7 +53,6 @@ class ApiDetail(View):
 
     def get(self, request, *args, **kwargs):
         apiPath = request.GET['path']
-        print apiPath
         if None == apiPath:
             return HttpResponse("missing path in request", status = 401)
         apis = ApiEntry.objects.filter(path = apiPath)
