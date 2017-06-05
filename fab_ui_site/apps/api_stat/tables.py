@@ -19,6 +19,7 @@ class DocUrlColumn(tables.Column):
 class ApiSummarizeTable(tables.Table):
     class Meta:
         attrs = {'class': 'paleblue', 'style': 'width:100%'}
+    name = tables.Column(verbose_name = ur'API名称')
     path = tables.Column(verbose_name = ur'访问路径')
 #    test_passed = tables.Column()
     doc = DocUrlColumn(verbose_name = ur'文档路径', empty_values = ())

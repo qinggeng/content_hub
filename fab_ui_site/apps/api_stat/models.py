@@ -22,6 +22,7 @@ class BaseModel(models.Model):
 class ApiEntry(BaseModel):
     path = models.TextField(null = False)
     docUrl = models.URLField()
+    name = models.TextField(default = "")
     history = HistoricalRecords()
 
 class TestResult(BaseModel):

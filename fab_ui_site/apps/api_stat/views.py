@@ -70,9 +70,12 @@ class ApiDetail(View):
         args = json.loads(request.body)
         apis = ApiEntry.objects.filter(path = args['path'])
         if len(apis) == 0:
-            return HttpResponse(ur'api "{p}" not found'.format(p = args['path']), status = 404)
+            apis = []
+            apis.append(ApiEntry())
         api = apis[0]
-        for key in filter(lambda x: x not in set(['path', 'id', 'createTime', 'updateTime']), args.keys()):
+        for key in filter(lambda x: x not in set(['id', 'createTime', 'updateTime']), args.keys()):
+            if 'name' == key:
+                args[key] = args[key]
             if hasattr(api, key):
                 setattr(api, key, args[key])
         api.save()
@@ -84,14 +87,12 @@ class ApiDetail(View):
 
 class ApiSummary(View):
     def get(self, request, *args, **kwargs):
-        apis = ApiEntry.objects.all()
-        apis = map(lambda x: dict(path = x.path, docUrl = x.docUrl, id = x.id), apis)
+        apis = ApiEntry.objects.all().order_by('path')
+        apis = map(lambda x: dict(path = x.path, docUrl = x.docUrl, id = x.id, name = x.name), apis)
         return render(request, 'apiList.html', {'api': ApiSummarizeTable(apis)})
-        pass
 
 class ApiHistory(View):
     def get(self, request, *args, **kwargs):
         apiId = kwargs.pop('id')
         api = ApiEntry.objects.get(id = apiId)
         return HttpResponse(json.dumps(map(lambda x: x.instance, api.history.all()), cls = ApiEntryEncoder), status = 200)
-        pass
