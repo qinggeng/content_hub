@@ -7,7 +7,7 @@ import uuid
 # Create your models here.
 class Page(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
-    uri = models.CharField(max_length = 65535, null = False)
+    uri = models.TextField(max_length = 65535, null = False)
     content = models.TextField(blank = True)
 
 class PageContributors(models.Model):

@@ -8,8 +8,8 @@ class ApiTest(LiveServerTestCase):
         args = dict(apiList = """
 v2
     auth
-        signup
         signin
+        signup
     user
         :id
     """.strip())
@@ -21,14 +21,14 @@ v2
         result = """
 /v2
 /v2/auth
-/v2/auth/signup
 /v2/auth/signin
+/v2/auth/signup
 /v2/user
 /v2/user/:id
 """.strip()
         c = Client()
         resp = self.do_create_outline()
-        self.assertEqual(resp.content, result)
+        self.assertEqual(resp.content.strip(), result)
         resp = c.get('/api/outline/')
         self.assertEqual(resp.content, result)
         resp = c.get('/api/outline/v2/user')

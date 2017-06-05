@@ -25,6 +25,7 @@ class ApiOutline(View):
             apis = map(lambda x: x.path, ApiEntry.objects.all())
         else:
             apis = map(lambda x: x.path, ApiEntry.objects.filter(path = apiPath))
+        apis.sort()
         return HttpResponse('\n'.join(apis), status = 200)
     def put(self, request, *args, **kwargs):
         pass

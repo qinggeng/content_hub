@@ -20,7 +20,7 @@ class BaseModel(models.Model):
         abstract = True
 
 class ApiEntry(BaseModel):
-    path = models.CharField(max_length = 65535, null = False)
+    path = models.TextField(null = False)
     docUrl = models.URLField()
     history = HistoricalRecords()
 
