@@ -7,7 +7,7 @@ from django.http import HttpResponse
 
 import json
 
-from models import ApiEntry
+from models import ApiEntry, TestCase
 from utils import genApis
 from modelJsonizers import *
 from tables import *
@@ -96,3 +96,30 @@ class ApiHistory(View):
         apiId = kwargs.pop('id')
         api = ApiEntry.objects.get(id = apiId)
         return HttpResponse(json.dumps(map(lambda x: x.instance, api.history.all()), cls = ApiEntryEncoder), status = 200)
+
+class ApiTestCase(View):
+    def get(self, request, *args, **kwargs):
+        apiId = kwargs.pop('id')
+        try:
+            api = ApiEntry.objects.get(id = apiId)
+        except Exception, e:
+            return HttpResponse(u'bad request, api "{}" dose not exist'.format(apiId), status = 404)
+        testcases = TestCase.objects.filter(api = api)
+        return HttpResponse(json.dumps(list(testcases), cls = TestCaseEncoder), status = 200)
+
+    def post(self, request, *args, **kwargs):
+        args = json.loads(request.body)
+        apiId = kwargs.pop('id')
+        try:
+            api = ApiEntry.objects.get(id = apiId)
+        except Exception, e:
+            return HttpResponse(u'bad request, api "{}" dose not exist'.format(apiId), status = 404)
+        for testcase in args:
+            name = testcase['name']
+            func = testcase['func']
+            author = testcase['author']
+            tc = TestCase(name = name, func = func, author = author, api = api, raw_api = api.path)
+            tc.save()
+        testcases = TestCase.objects.filter(api = api)
+        return HttpResponse(json.dumps(list(testcases), cls = TestCaseEncoder), status = 200)
+

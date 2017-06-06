@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from apps.api_stat.views import ApiOutline, ApiDetail, ApiHistory, ApiSummary
+from apps.api_stat.views import ApiOutline, ApiDetail, ApiHistory, ApiSummary, ApiTestCase
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^api/detail', ApiDetail.as_view()),
     url(r'^api/summary', ApiSummary.as_view()),
     url(r'^api/(?P<id>[A-Z0-9a-z-]+)/history', ApiHistory.as_view()),
+    url(r'^api/(?P<id>[A-Z0-9a-z-]+)/testcases', ApiTestCase.as_view()),
 ]

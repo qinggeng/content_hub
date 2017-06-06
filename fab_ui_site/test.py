@@ -78,35 +78,43 @@ v2
             f.write(resp.content)
             f.close()
 
-    def do_create_testcase(self):
+    def do_create_testcase(self, testcases = None):
         c = Client()
         resp = c.get('/api/detail?path=/v2/user')
         self.assertEqual(resp.status_code, 200)
         detail = json.loads(resp.content)
-        testcases = [dict(name = 'aaa', func = 'bbb', author = 'hyk')]
+        if None == testcases:
+            testcases = [dict(name = 'aaa', func = 'bbb', author = 'hyk')]
         resp = c.post('/api/{id}/testcases'.format(id = detail['id']), json.dumps(testcases), content_type = 'application/json')
         self.assertEqual(resp.status_code, 200)
         detail = json.loads(resp.content)
         return (detail, c)
 
     def test_append_api_testcase(self):
+        n1 = datetime.now()
         self.do_create_outline()
-        detail, c = self.do_create_testcase()
+        testcases = [dict(name = 'aaa', func = 'bbb', author = 'hyk')]
+        detail, c = self.do_create_testcase(testcases)
         testcase = detail[0]
+        self.assertTrue('api' in testcase)
         self.assertEqual(testcases[0]['name'], testcase['name'])
-        self.assertEqual(testcases[0]['func'], testcase['name'])
-        self.assertEqual(testcases[0]['author'], testcase['name'])
+        self.assertEqual(testcases[0]['func'], testcase['func'])
+        self.assertEqual(testcases[0]['author'], testcase['author'])
         resp = c.get('/api/detail?path=/v2/user')
-        self.assertequal(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
         detail = json.loads(resp.content)
         c.get('/api/{id}/testcases'.format(id = detail['id']))
-        self.assertequal(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 200)
+        print resp.content
         detail = json.loads(resp.content)
         self.assertEqual(len(detail), 1)
         testcase = detail[0]
+        self.assertTrue('api' in testcase)
         self.assertEqual(testcases[0]['name'], testcase['name'])
-        self.assertEqual(testcases[0]['func'], testcase['name'])
-        self.assertEqual(testcases[0]['author'], testcase['name'])
+        self.assertEqual(testcases[0]['func'], testcase['func'])
+        self.assertEqual(testcases[0]['author'], testcase['author'])
+        n2 = datetime.now()
+        print (n2 - n1).total_seconds()
 
     def test_append_test_round(self):
         self.do_create_outline()
