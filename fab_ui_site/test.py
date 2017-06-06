@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import Client
 import json
+from datetime import datetime
 from django.test.testcases import LiveServerTestCase
 class ApiTest(LiveServerTestCase):
 
@@ -76,3 +77,52 @@ v2
         with open('static/test/test.html', 'w') as f:
             f.write(resp.content)
             f.close()
+
+    def do_create_testcase(self):
+        c = Client()
+        resp = c.get('/api/detail?path=/v2/user')
+        self.assertEqual(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        testcases = [dict(name = 'aaa', func = 'bbb', author = 'hyk')]
+        resp = c.post('/api/{id}/testcases'.format(id = detail['id']), json.dumps(testcases), content_type = 'application/json')
+        self.assertEqual(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        return (detail, c)
+
+    def test_append_api_testcase(self):
+        self.do_create_outline()
+        detail, c = self.do_create_testcase()
+        testcase = detail[0]
+        self.assertEqual(testcases[0]['name'], testcase['name'])
+        self.assertEqual(testcases[0]['func'], testcase['name'])
+        self.assertEqual(testcases[0]['author'], testcase['name'])
+        resp = c.get('/api/detail?path=/v2/user')
+        self.assertequal(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        c.get('/api/{id}/testcases'.format(id = detail['id']))
+        self.assertequal(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        self.assertEqual(len(detail), 1)
+        testcase = detail[0]
+        self.assertEqual(testcases[0]['name'], testcase['name'])
+        self.assertEqual(testcases[0]['func'], testcase['name'])
+        self.assertEqual(testcases[0]['author'], testcase['name'])
+
+    def test_append_test_round(self):
+        self.do_create_outline()
+        detail, c = self.do_create_testcase()
+        args = dict(epoch = int(datetime.now().strftime('%s')),
+                test_results = [dict(api = '/v2/user',
+                    passed = True,
+                    func = 'bbb')])
+        resp = c.post('/api/test_round/', json.dumps(args), content_type = 'application/json')
+        self.assertEqual(resp.status_code, 200)
+        detail = json.loads(resp)
+        self.assertTrue('id' in detail)
+        resp = c.get('/api/detail?path=/v2/user')
+        self.assertEqual(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        self.assertTrue('testSummary' in detail)
+        self.assertEqual('共有1个测试用例, 经历了1轮测试', detail['testSummary'])
+        self.assertTrue('testResult' in detail)
+        self.assertEqual('PASSED', detail['testResult'])
