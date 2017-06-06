@@ -25,7 +25,21 @@ class ApiEntry(BaseModel):
     name = models.TextField(default = "")
     history = HistoricalRecords()
 
+class TestCase(BaseModel):
+    api = models.ForeignKey('ApiEntry', on_delete = models.SET_NULL, null = True)
+    raw_api = models.TextField(null = False)
+    func = models.TextField(null = False)
+    name = models.TextField(null = False)
+    author = models.TextField(null = False)
+    history = HistoricalRecords()
+
 class TestResult(BaseModel):
-    api = models.ForeignKey('ApiEntry', on_delete = models.CASCADE)
+    api = models.ForeignKey('ApiEntry', on_delete = models.SET_NULL, null = True)
+    testRound = models.ForeignKey('TestRound', on_delete = models.CASCADE, null = True)
+    testCase = models.ForeignKey('TestCase', on_delete = models.SET_NULL, null = True)
+    raw_testcase = models.TextField(null = False, default = '')
     history = HistoricalRecords()
     
+class TestRound(BaseModel):
+    testtime = models.DateTimeField(editable = False, null = False)
+    history = HistoricalRecords()
