@@ -103,7 +103,7 @@ class ApiTestCase(View):
         try:
             api = ApiEntry.objects.get(id = apiId)
         except Exception, e:
-            return HttpResponse(u'bad request, api "{}" dose not exist'.format(apiId), status = 404)
+            return HttpResponse(u'bad request, api "{id}" dose not exist'.format(id = apiId), status = 404)
         testcases = TestCase.objects.filter(api = api)
         return HttpResponse(json.dumps(list(testcases), cls = TestCaseEncoder), status = 200)
 

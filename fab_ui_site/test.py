@@ -103,9 +103,8 @@ v2
         resp = c.get('/api/detail?path=/v2/user')
         self.assertEqual(resp.status_code, 200)
         detail = json.loads(resp.content)
-        c.get('/api/{id}/testcases'.format(id = detail['id']))
+        resp = c.get('/api/{id}/testcases'.format(id = detail['id']))
         self.assertEqual(resp.status_code, 200)
-        print resp.content
         detail = json.loads(resp.content)
         self.assertEqual(len(detail), 1)
         testcase = detail[0]
