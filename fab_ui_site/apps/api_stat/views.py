@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
+from django.db import transaction
 
 import json
 
@@ -13,7 +14,8 @@ from modelJsonizers import *
 from tables import *
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-
+from time import ctime
+from datetime import datetime
 # Create your views here.
 
 
@@ -122,4 +124,39 @@ class ApiTestCase(View):
             tc.save()
         testcases = TestCase.objects.filter(api = api)
         return HttpResponse(json.dumps(list(testcases), cls = TestCaseEncoder), status = 200)
+
+class ApiTestRound(View):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        try:
+            args = json.loads(request.body)
+        except Exception, e:
+            return HttpResponse('invalid request body', status = 401)
+        apiResults = {}
+        testRound = TestRound()
+        testRound.testtime = datetime.fromtimestamp(args['epoch'])
+        testRound.save()
+        testResults = args['test_results']
+        for testResult in testResults:
+            apiPath = testResult['api']
+            passed = testResult['passed']
+            func = testResult['func']
+            apiResult = None
+            if apiPath not in apiResults:
+                try:
+                    api = ApiEntry.objects.get(path = apiPath)
+                    apiResult = ApiTestResult(api = api, testRound = testRound, raw_api = api.path, passed = testResult['passed'])
+                    apiResults[apiPath] = apiResult
+                except Exception, e:
+                    #TODO logging
+                    print 'REQUEST ERROR: unknown api path: {p}'.format(apiPath)
+                    continue
+            else:
+                apiResult = apiResults[apiPath]
+                apiResult.passed = (apiResult.passed and testResult['passed'])
+                apiResult.save()
+            testResultRecord = TestResult(api = apiResult.api, testRound = testRound, testCase = TestCase.objects.get(func = testResult['func']), raw_testcase = testResult['func'], passed = testResult['passed'])
+            testResultRecord.save()
+        return HttpResponse(json.dumps(testRound, cls = TestRoundEncoder), status = 200)
+
 

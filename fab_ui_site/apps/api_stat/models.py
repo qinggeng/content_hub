@@ -24,6 +24,23 @@ class ApiEntry(BaseModel):
     docUrl = models.URLField()
     name = models.TextField(default = "")
     history = HistoricalRecords()
+    @property
+    def testSummary(self):
+        template = u"共有{n}个测试用例，经历了{m}轮测试"
+        n = len(TestCase.objects.filter(api = self))
+        m = len(ApiTestResult.objects.filter(api = self))
+        return template.format(n = n, m = m)
+    @property
+    def passed(self):
+        try:
+            passed = ApiTestResult.objects.filter(api = self).order_by('updatetime').last().passed
+            if passed:
+                return u'PASSED'
+            else:
+                return u'FAILED'
+        except Exception, e:
+            return u'N/A'
+
 
 class TestCase(BaseModel):
     api = models.ForeignKey('ApiEntry', on_delete = models.SET_NULL, null = True)
@@ -38,6 +55,14 @@ class TestResult(BaseModel):
     testRound = models.ForeignKey('TestRound', on_delete = models.CASCADE, null = True)
     testCase = models.ForeignKey('TestCase', on_delete = models.SET_NULL, null = True)
     raw_testcase = models.TextField(null = False, default = '')
+    passed = models.BooleanField(null = False, default = False)
+    history = HistoricalRecords()
+
+class ApiTestResult(BaseModel):
+    api = models.ForeignKey('ApiEntry', on_delete = models.SET_NULL, null = True)
+    raw_api = models.TextField(null = False)
+    testRound = models.ForeignKey('TestRound', on_delete = models.CASCADE, null = True)
+    passed = models.BooleanField(null = False)
     history = HistoricalRecords()
     
 class TestRound(BaseModel):
