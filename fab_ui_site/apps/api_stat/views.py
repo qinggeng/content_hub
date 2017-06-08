@@ -147,6 +147,7 @@ class ApiTestRound(View):
                     api = ApiEntry.objects.get(path = apiPath)
                     apiResult = ApiTestResult(api = api, testRound = testRound, raw_api = api.path, passed = testResult['passed'])
                     apiResults[apiPath] = apiResult
+                    apiResult.save()
                 except Exception, e:
                     #TODO logging
                     print 'REQUEST ERROR: unknown api path: {p}'.format(apiPath)

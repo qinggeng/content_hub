@@ -23,4 +23,5 @@ class ApiSummarizeTable(tables.Table):
     path = tables.Column(verbose_name = ur'访问路径')
 #    test_passed = tables.Column()
     doc = DocUrlColumn(verbose_name = ur'文档路径', empty_values = ())
-    test = tables.Column(verbose_name = ur'测试情况', accessor = A('test'), default = 'N/A')
+    test = tables.Column(verbose_name = ur'最后一次测试情况', accessor = A('passed'), default = 'N/A')
+    test = tables.Column(verbose_name = ur'测试概要', accessor = A('testSummary'), default = 'N/A')

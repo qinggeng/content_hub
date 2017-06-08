@@ -26,14 +26,14 @@ class ApiEntry(BaseModel):
     history = HistoricalRecords()
     @property
     def testSummary(self):
-        template = u"共有{n}个测试用例，经历了{m}轮测试"
+        template = u"共有{n}个测试用例, 经历了{m}轮测试"
         n = len(TestCase.objects.filter(api = self))
         m = len(ApiTestResult.objects.filter(api = self))
         return template.format(n = n, m = m)
     @property
     def passed(self):
         try:
-            passed = ApiTestResult.objects.filter(api = self).order_by('updatetime').last().passed
+            passed = ApiTestResult.objects.filter(api = self).order_by('updateTime').last().passed
             if passed:
                 return u'PASSED'
             else:

@@ -131,6 +131,6 @@ v2
         detail = json.loads(resp.content)
         self.assertTrue('testSummary' in detail)
         print detail['testSummary']
-        self.assertEqual('共有1个测试用例, 经历了1轮测试', detail['testSummary'])
+        self.assertEqual(u'共有1个测试用例, 经历了1轮测试', detail['testSummary'])
         self.assertTrue('testResult' in detail)
         self.assertEqual('PASSED', detail['testResult'])
