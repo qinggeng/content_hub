@@ -90,7 +90,7 @@ class ApiDetail(View):
 class ApiSummary(View):
     def get(self, request, *args, **kwargs):
         apis = ApiEntry.objects.all().order_by('path')
-        apis = map(lambda x: dict(path = x.path, docUrl = x.docUrl, id = x.id, name = x.name), apis)
+        apis = map(lambda x: dict(path = x.path, docUrl = x.docUrl, id = x.id, name = x.name, passed = x.passed, testSummary = x.testSummary), apis)
         return render(request, 'apiList.html', {'api': ApiSummarizeTable(apis)})
 
 class ApiHistory(View):
@@ -100,6 +100,10 @@ class ApiHistory(View):
         return HttpResponse(json.dumps(map(lambda x: x.instance, api.history.all()), cls = ApiEntryEncoder), status = 200)
 
 class ApiTestCase(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(ApiTestCase, self).dispatch(*args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         apiId = kwargs.pop('id')
         try:
