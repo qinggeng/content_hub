@@ -122,7 +122,7 @@ v2
                 test_results = [dict(api = '/v2/user',
                     passed = True,
                     func = 'bbb')])
-        resp = c.post('/api/test_round/', json.dumps(args), content_type = 'application/json')
+        resp = c.post('/api/test_round', json.dumps(args), content_type = 'application/json')
         self.assertEqual(resp.status_code, 200)
         detail = json.loads(resp.content)
         self.assertTrue('id' in detail)
@@ -134,3 +134,29 @@ v2
         self.assertEqual(u'共有1个测试用例, 经历了1轮测试', detail['testSummary'])
         self.assertTrue('testResult' in detail)
         self.assertEqual('PASSED', detail['testResult'])
+
+    def test_post_to_readonly_test_round(self):
+        self.do_create_outline()
+        detail, c = self.do_create_testcase()
+        args = dict(epoch = int(datetime.now().strftime('%s')),
+                test_results = [dict(api = '/v2/user',
+                    passed = True,
+                    func = 'bbb')])
+        resp = c.post('/api/test_round/123', json.dumps(args), content_type = 'application/json')
+        self.assertTrue(resp.status_code >= 400 and resp.status_code < 500)
+
+    def test_get_testround(self):
+        self.do_create_outline()
+        detail, c = self.do_create_testcase()
+        args = dict(epoch = int(datetime.now().strftime('%s')),
+                test_results = [dict(api = '/v2/user',
+                    passed = True,
+                    func = 'bbb')])
+        resp = c.post('/api/test_round', json.dumps(args), content_type = 'application/json')
+        self.assertEqual(resp.status_code, 200)
+        detail = json.loads(resp.content)
+        self.assertTrue('id' in detail)
+        resp = c.get('/api/test_round/{id}?t=json'.format(id = detail['id']))
+        self.assertEqual(resp.status_code, 200)
+        resp = c.get('/api/test_round/{id}?t=html'.format(id = detail['id']))
+        self.assertEqual(resp.status_code, 200)

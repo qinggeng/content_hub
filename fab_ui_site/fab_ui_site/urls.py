@@ -24,5 +24,7 @@ urlpatterns = [
     url(r'^api/summary', ApiSummary.as_view()),
     url(r'^api/(?P<id>[A-Z0-9a-z-]+)/history', ApiHistory.as_view()),
     url(r'^api/(?P<id>[A-Z0-9a-z-]+)/testcases', ApiTestCase.as_view()),
-    url(r'^api/test_round', ApiTestRound.as_view()),
+    url(r'^api/test_round/$', ApiTestRound.as_view()),
+    url(r'^api/test_round$', ApiTestRound.as_view()),
+    url(r'^api/test_round/(?P<id>[A-Z0-9a-z-]+)', ApiTestRound.as_view()),
 ]

@@ -129,6 +129,8 @@ class ApiTestRound(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
+            if 'id' in kwargs:
+                return HttpResponse('post to a specific test round makes no sense', status = 401)
             args = json.loads(request.body)
         except Exception, e:
             return HttpResponse('invalid request body', status = 401)
@@ -159,5 +161,29 @@ class ApiTestRound(View):
             testResultRecord = TestResult(api = apiResult.api, testRound = testRound, testCase = TestCase.objects.get(func = testResult['func']), raw_testcase = testResult['func'], passed = testResult['passed'])
             testResultRecord.save()
         return HttpResponse(json.dumps(testRound, cls = TestRoundEncoder), status = 200)
+
+    def get(self, request, *args, **kwargs):
+        if 't' not in request.GET:
+            fmt = 'json'
+        else:
+            fmt = request.GET['t']
+        if fmt not in set('json'):
+            return HttpResponse('{fmt} format not implemented in this api'.format(fmt = fmt), status = 500)
+        try:
+            rid = kwargs.pop('id')
+            testRound = TestRound.objects.get(id = rid)
+            testResults = TestResult.objects.filter(testRound = testRound)
+            respDict = {
+                'id': unicode(testRound.id),
+                'testtime': testRound.testtime.strftime('%Y-%m-%d %H:%M'),
+                'desc': testRound.desc,
+                'results': map(lambda x: dict(api = x.testCase.raw_api, func = x.testCase.func, name = x.testCase.name, author = x.testCase.author, passed = x.passed), testResults),
+            }
+            if fmt == 'json':
+                return HttpResponse(json.dumps(respDict), status = 200)
+        except Exception, e:
+            print e
+            return HttpResponse('test round "{id}" not found'.format(id = rid), status = 404)
+        pass
 
 
