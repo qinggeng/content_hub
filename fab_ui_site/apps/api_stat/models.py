@@ -67,4 +67,5 @@ class ApiTestResult(BaseModel):
     
 class TestRound(BaseModel):
     testtime = models.DateTimeField(editable = False, null = False)
+    desc = models.TextField(null = True)
     history = HistoricalRecords()
