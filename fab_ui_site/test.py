@@ -160,3 +160,22 @@ v2
         self.assertEqual(resp.status_code, 200)
         resp = c.get('/api/test_round/{id}?t=html'.format(id = detail['id']))
         self.assertEqual(resp.status_code, 200)
+
+    class BugChartCase(LiveServerTestCase):
+        
+        def test_draw_stack_area_chart(self):
+            ur"""测试堆积面积图接口"""
+            c = Client()
+            args = dict(
+                xAxisName = 'Days',
+                yAxisName = 'Bugs',
+                format = 'png',
+                size = [800, 600],
+                series = [
+                    dict(style = dict(
+                            colors = [], 
+                            legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
+                        data= []),
+                ]
+            )
+            resp = e.post('/forms/newStackAreaChart', args)
