@@ -161,21 +161,36 @@ v2
         resp = c.get('/api/test_round/{id}?t=html'.format(id = detail['id']))
         self.assertEqual(resp.status_code, 200)
 
-    class BugChartCase(LiveServerTestCase):
-        
-        def test_draw_stack_area_chart(self):
-            ur"""测试堆积面积图接口"""
-            c = Client()
-            args = dict(
-                xAxisName = 'Days',
-                yAxisName = 'Bugs',
-                format = 'png',
-                size = [800, 600],
-                series = [
-                    dict(style = dict(
-                            colors = [], 
-                            legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
-                        data= []),
-                ]
-            )
-            resp = e.post('/forms/newStackAreaChart', args)
+class BugChartCase(LiveServerTestCase):
+
+    def test_create_statck_area_chart_template(self):
+        ur"""测试创建图表的模板"""
+        c = Client()
+        args = dict(
+            codeName = '',
+            xAxisName = 'Days',
+            yAxisName = 'Bugs',
+            series = [
+                dict(style = dict(
+                        colors = [], 
+                        legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
+                    sampleData = []),
+            ]
+        )
+        resp = g.post('/forms/newStackAreaChartTemplate', args)
+        pass
+    
+    def test_draw_stack_area_chart(self):
+        ur"""测试堆积面积图接口"""
+        c = Client()
+        args = dict(
+            xAxisName = 'Days',
+            yAxisName = 'Bugs',
+            series = [
+                dict(style = dict(
+                        colors = [], 
+                        legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
+                    data= []),
+            ]
+        )
+        resp = g.post('/forms/newStackAreaChart', args)
