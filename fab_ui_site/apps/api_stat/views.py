@@ -124,6 +124,8 @@ class ApiTestCase(View):
             name = testcase['name']
             func = testcase['func']
             author = testcase['author']
+            if TestCase.objects.filter(func = func, api = api).exists():
+              continue
             tc = TestCase(name = name, func = func, author = author, api = api, raw_api = api.path)
             tc.save()
         testcases = TestCase.objects.filter(api = api)

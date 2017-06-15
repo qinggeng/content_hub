@@ -1,6 +1,11 @@
 db=content_db
 app=content_app
 port=8000
+if [ -n "$(lsof -i:$port)" ]
+then
+  echo port $port is used, failed
+  exit 1
+fi
 docker rm -f $db
 docker rm -f $app
 ./mkmemdisk.sh
