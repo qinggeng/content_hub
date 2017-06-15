@@ -183,14 +183,108 @@ class BugChartCase(LiveServerTestCase):
     def test_draw_stack_area_chart(self):
         ur"""测试堆积面积图接口"""
         c = Client()
+        slices = [
+            {
+                "data": [
+                    9, 
+                    10, 
+                    25, 
+                    3
+                ], 
+                "tick": "06-06"
+            }, 
+            {
+                "data": [
+                    91, 
+                    8, 
+                    0, 
+                    0
+                ], 
+                "tick": "06-07"
+            }, 
+            {
+                "data": [
+                    94, 
+                    3, 
+                    1, 
+                    0
+                ], 
+                "tick": "06-08"
+            }, 
+            {
+                "data": [
+                    79, 
+                    6, 
+                    4, 
+                    0
+                ], 
+                "tick": "06-09"
+            }, 
+            {
+                "data": [
+                    44, 
+                    0, 
+                    36, 
+                    3
+                ], 
+                "tick": "06-10"
+            }, 
+            {
+                "data": [
+                    5, 
+                    40, 
+                    27, 
+                    2
+                ], 
+                "tick": "06-11"
+            }, 
+            {
+                "data": [
+                    27, 
+                    50, 
+                    10, 
+                    1
+                ], 
+                "tick": "06-12"
+            }, 
+            {
+                "data": [
+                    39, 
+                    4, 
+                    27, 
+                    24
+                ], 
+                "tick": "06-13"
+            }, 
+            {
+                "data": [
+                    22, 
+                    44, 
+                    13, 
+                    16
+                ], 
+                "tick": "06-14"
+            }, 
+            {
+                "data": [
+                    80, 
+                    15, 
+                    1, 
+                    0
+                ], 
+                "tick": "06-15"
+            }
+        ]
         args = dict(
-            xAxisName = 'Days',
-            yAxisName = 'Bugs',
+            chartType = 'stackArea',
+            xAxis = dict(
+                name = 'Date',
+            yAxis = dict(
+                name = 'Bugs'),
             series = [
                 dict(style = dict(
-                        colors = [], 
                         legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
-                    data= []),
+                        slices = slices,
             ]
         )
-        resp = g.post('/forms/newStackAreaChart', args)
+        resp = g.post('/reports/charts', args)
