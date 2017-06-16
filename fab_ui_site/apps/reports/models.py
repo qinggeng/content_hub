@@ -20,3 +20,7 @@ class Transactions(models.Model):
     #time
     #type
     transction = models.TextField(null = False)
+
+class Chart(models.Model):
+    id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
+    args = models.TextField()

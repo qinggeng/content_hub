@@ -179,7 +179,8 @@ class BugChartCase(LiveServerTestCase):
         )
         resp = g.post('/forms/newStackAreaChartTemplate', args)
         pass
-    
+
+class ChartCase(LiveServerTestCase):
     def test_draw_stack_area_chart(self):
         ur"""测试堆积面积图接口"""
         c = Client()
@@ -278,13 +279,16 @@ class BugChartCase(LiveServerTestCase):
         args = dict(
             chartType = 'stackArea',
             xAxis = dict(
-                name = 'Date',
+                name = 'Date',),
             yAxis = dict(
-                name = 'Bugs'),
+                name = 'Bugs',),
             series = [
                 dict(style = dict(
                         legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
                         slices = slices,
-            ]
-        )
-        resp = g.post('/reports/charts', args)
+                ),
+            ],
+            )
+        resp = c.post('/report/charts', json.dumps(args), content_type='application/json')
+        print resp.url
+        self.assertEqual(resp.status_code, 302)
