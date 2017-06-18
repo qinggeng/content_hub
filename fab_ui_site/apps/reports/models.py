@@ -24,3 +24,8 @@ class Transactions(models.Model):
 class Chart(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
     args = models.TextField()
+
+class ChartArg(models.Model):
+    id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
+    digest = models.TextField(blank = True)
+    content = models.TextField(default = u"")

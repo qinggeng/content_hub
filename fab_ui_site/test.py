@@ -282,13 +282,16 @@ class ChartCase(LiveServerTestCase):
                 name = 'Date',),
             yAxis = dict(
                 name = 'Bugs',),
-            series = [
+            series = 
                 dict(style = dict(
                         legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
                         slices = slices,
                 ),
-            ],
             )
         resp = c.post('/report/charts', json.dumps(args), content_type='application/json')
-        print resp.url
         self.assertEqual(resp.status_code, 302)
+        resp = c.get(resp.url)
+        self.assertEqual(resp.status_code, 200)
+        with open("static/test/chart.html", 'w') as f:
+            f.write(resp.content)
+            f.close()

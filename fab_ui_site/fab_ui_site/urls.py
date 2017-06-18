@@ -28,5 +28,6 @@ urlpatterns = [
     url(r'^api/test_round/$', ApiTestRound.as_view()),
     url(r'^api/test_round$', ApiTestRound.as_view()),
     url(r'^api/test_round/(?P<id>[A-Z0-9a-z-]+)', ApiTestRound.as_view()),
+    url(r'^report/charts/(?P<id>[a-z0-9]+)', Chart.as_view()),
     url(r'^report/charts', Chart.as_view()),
 ]

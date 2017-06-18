@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>ECharts</title>
     <!-- 引入 echarts.js -->
-    <script src="echarts.min.js"></script>
+    <script src="/static/js/echarts.min.js"></script>
 </head>
 <body>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
@@ -14,8 +14,7 @@
         var myChart = echarts.init(document.getElementById('main'));
 
         // 指定图表的配置项和数据
-		/*
-        var option = {
+        var options = {
             title: {
                 text: 'ECharts 入门示例'
             },
@@ -33,8 +32,9 @@
                 data: [5, 20, 36, 10, 10, 20]
             }]
         };
+		/*
+		var options = {{options}};
 		*/
-		var options = {{options}}
 
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(options);
