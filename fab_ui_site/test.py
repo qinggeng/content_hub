@@ -278,13 +278,14 @@ class ChartCase(LiveServerTestCase):
         ]
         args = dict(
             chartType = 'stackArea',
+            title = 'bug变动报告',
             xAxis = dict(
                 name = 'Date',),
             yAxis = dict(
                 name = 'Bugs',),
             series = 
                 dict(style = dict(
-                        legends = ['Open', 'Ready for Verify', 'Resolved', 'Invalid']), 
+                        legends = list(reversed(['Open', 'Ready for Verify', 'Resolved', 'Invalid']))), 
                         slices = slices,
                 ),
             )

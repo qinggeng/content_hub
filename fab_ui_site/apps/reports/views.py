@@ -27,13 +27,21 @@ def makeEchartOptions(args):
     _ = dict
     xAxis = map(lambda x: x['tick'], args['series']['slices'])
     legends = args['series']['style']['legends']
-    series = map(lambda x: _(name = x, data = [], type = 'line'), legends)
+    label = _(normal = _(show = False, position = 'top'))
+    series = map(lambda x: _(name = x, stack = u"总量", areaStyle = _(normal = _()), label = label, data = [], type = 'line'), legends)
     for slice in args['series']['slices']:
         for s, d in zip(series, slice['data']):
             s['data'].append(d)
+    tooltip = _(
+        trigger = 'axis',
+        axisPointer = _(
+            type = 'cross',
+            label = _(
+                backgoundColor = '#6a7985')))
     options = _(
-        title =  _(text = 'example'),
-        tooltip = _(),
+        title =  _(text = args.get('title', u'无标题图表')),
+        tooltip = tooltip,
+        legend = _(data = legends),
         xAxis = _(data = xAxis),
         yAxis = _(),
         series = series
@@ -52,7 +60,7 @@ class Chart(View):
         chartArg = ChartArg.objects.get(digest = digest)
         chartArg = json.loads(chartArg.content)
         echartOptions = makeEchartOptions(chartArg)
-        return render(request, 'chartPage.html', {'options': mark_safe(json.dumps(echartOptions, ensure_ascii = False))})
+        return render(request, 'chartPage.html', {'title': echartOptions['title']['text'], 'options': mark_safe(json.dumps(echartOptions, ensure_ascii = False))})
 
     def put(self, request, *args, **kwargs):
         pass
