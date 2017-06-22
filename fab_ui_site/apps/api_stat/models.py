@@ -48,6 +48,7 @@ class TestCase(BaseModel):
     func = models.TextField(null = False)
     name = models.TextField(null = False)
     author = models.TextField(null = False)
+    commitTime = models.DateTimeField(null = True)
     history = HistoricalRecords()
 
 class TestResult(BaseModel):

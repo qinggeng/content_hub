@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.test import Client
-import json, re, urlparse
+import json, re, urlparse, itertools
 from datetime import datetime, timedelta
 from django.test.testcases import LiveServerTestCase
 from apps.api_stat.models import TestCase
 class PerformaceReportTest(LiveServerTestCase):
    @classmethod
    def setUpClass(cls):
-       authors = ['John', 'Mike', 'Frank']
-       dates = map(lambda x: datetime.strptime('2017-06-19', '%Y-%m-%d') + timedelta(days = x), range(5))
-       
+       from mockTestcases import mocks
+       for tcm in mocks:
+           tc = TestCase()
+           tc.raw_api = ''
+           tc.func = tcm['func']
+           tc.name = tcm['name']
+           tc.author = tcm['author']
+           tc.save()
        pass
    @classmethod
    def tearDownClass(cls):
