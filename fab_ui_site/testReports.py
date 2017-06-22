@@ -8,12 +8,14 @@ class PerformaceReportTest(LiveServerTestCase):
    @classmethod
    def setUpClass(cls):
        from mockTestcases import mocks
+       print len(mocks)
        for tcm in mocks:
            tc = TestCase()
            tc.raw_api = ''
            tc.func = tcm['func']
            tc.name = tcm['name']
            tc.author = tcm['author']
+           tc.createTime = tcm['createDate']
            tc.save()
        pass
    @classmethod
