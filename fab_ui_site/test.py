@@ -159,6 +159,7 @@ v2
         resp = c.get('/api/test_round/{id}?t=json'.format(id = detail['id']))
         self.assertEqual(resp.status_code, 200)
         resp = c.get('/api/test_round/{id}?t=html'.format(id = detail['id']))
+        print resp.content
         self.assertEqual(resp.status_code, 200)
 
 class BugChartCase(LiveServerTestCase):
@@ -177,7 +178,7 @@ class BugChartCase(LiveServerTestCase):
                     sampleData = []),
             ]
         )
-        resp = g.post('/forms/newStackAreaChartTemplate', args)
+        resp = c.post('/forms/newStackAreaChartTemplate', args)
         pass
 
 class ChartCase(LiveServerTestCase):

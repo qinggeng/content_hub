@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_tables2',
     'simple_history',
-    'apps.reports',
-    'apps.api_stat',
+    'site_apps.reports',
+    'site_apps.api_stat',
 ]
 
 MIDDLEWARE = [

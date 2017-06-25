@@ -172,8 +172,8 @@ class ApiTestRound(View):
         if 't' not in request.GET:
             fmt = 'json'
         else:
-            fmt = request.GET['t']
-        if fmt not in set('json'):
+            fmt = request.GET['t'].strip()
+        if fmt not in set(['json']):
             return HttpResponse('{fmt} format not implemented in this api'.format(fmt = fmt), status = 500)
         try:
             rid = kwargs.pop('id')

@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from apps.api_stat.views import ApiOutline, ApiDetail, ApiHistory, ApiSummary, ApiTestCase, ApiTestRound
-from apps.reports.views import Chart
+from site_apps.api_stat.views import ApiOutline, ApiDetail, ApiHistory, ApiSummary, ApiTestCase, ApiTestRound
+from site_apps.reports.views import Chart, ReportPage
+from site_apps.reports.forms import PerformanceChart
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -30,4 +31,6 @@ urlpatterns = [
     url(r'^api/test_round/(?P<id>[A-Z0-9a-z-]+)', ApiTestRound.as_view()),
     url(r'^report/charts/(?P<id>[a-z0-9]+)', Chart.as_view()),
     url(r'^report/charts', Chart.as_view()),
+    url(r'^report/(?P<id>[A-Z0-9a-z-]+)', ReportPage.as_view()),
+    url(r'^forms/performanceOnTestcase', PerformanceChart.as_view()),
 ]

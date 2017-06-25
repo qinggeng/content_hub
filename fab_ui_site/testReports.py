@@ -3,12 +3,13 @@ from django.test import Client
 import json, re, urlparse, itertools
 from datetime import datetime, timedelta
 from django.test.testcases import LiveServerTestCase
-from apps.api_stat.models import TestCase
+from site_apps.api_stat.models import TestCase
+from prettyprint import pp
 class PerformaceReportTest(LiveServerTestCase):
    @classmethod
    def setUpClass(cls):
        from mockTestcases import mocks
-       print len(mocks)
+       days = {}
        for tcm in mocks:
            tc = TestCase()
            tc.raw_api = ''
@@ -17,6 +18,14 @@ class PerformaceReportTest(LiveServerTestCase):
            tc.author = tcm['author']
            tc.createTime = tcm['createDate']
            tc.save()
+           date = tcm['createDate'][:10]
+           author = tcm['author']
+           if date not in days:
+               days[date] = {}
+           if author not in days[date]:
+               days[date][author] = 0
+           days[date][author] += 1
+       cls.days = days    
        pass
    @classmethod
    def tearDownClass(cls):
@@ -31,9 +40,12 @@ class PerformaceReportTest(LiveServerTestCase):
        resp = c.post(url, json.dumps(args), content_type = 'application/json')
        self.assertEqual(resp.status_code, 302)
        urlPart = urlparse.urlparse(resp.url)
-       self.assertTrue(None != re.atch(ur'/reports/(?P<id>[0-9a-z]+)'))
+       self.assertTrue(None != re.match(ur'/reports/(?P<id>[0-9a-z]+)', urlPart.path))
+       print resp.url
        jsonResp = c.get(resp.url, headers = {'Accept': 'application/json'})
-       self.assertEqual(resp.status_code, 200)
+       print jsonResp.content
+       self.assertEqual(jsonResp.status_code, 200)
+       self.assertEqual(resp.content, json.dumps(self.days))
        jReport = json.loads(jsonResp.content)
        hResp = c.get(resp.url, headers = {'Accept': 'text/html'})
        with open("static/test/performanceChart.html", 'w') as f:

@@ -65,16 +65,34 @@ class Chart(View):
     def put(self, request, *args, **kwargs):
         pass
 
-    def post(self, request, *args, **kwargs):
-        args = json.loads(request.body)
+    def saveChartArg(self, args):
         argsStr = json.dumps(args)
         argDigest = digest(argsStr)
+        try:
+            return ChartArg.objects.get(digest = argDigest).digest
+        except Exception, e:
+            pass
         chartArg = ChartArg()
         chartArg.digest = argDigest
         chartArg.content = argsStr
         chartArg.save()
+        return argDigest
+
+
+    def post(self, request, *args, **kwargs):
+        args = json.loads(request.body)
+        argDigest = self.saveChartArg(args)
         return HttpResponseRedirect('/report/charts/'+argDigest)
         pass
 
     def delete(self, request, *args, **kwargs):
         pass
+
+class ReportPage(View):
+    def get(self, request, *args, **kwargs):
+        reportId = kwargs.pop("id")
+        report = Report.get(id = reportId)
+        if report.pageUrl != null:
+            return HttpResponseRedirect(report.pageUrl)
+        else:
+            return HttpResponse(status = 404)
