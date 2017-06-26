@@ -40,15 +40,20 @@ class PerformaceReportTest(LiveServerTestCase):
        resp = c.post(url, json.dumps(args), content_type = 'application/json')
        self.assertEqual(resp.status_code, 302)
        urlPart = urlparse.urlparse(resp.url)
-       self.assertTrue(None != re.match(ur'/reports/(?P<id>[0-9a-z]+)', urlPart.path))
+       self.assertTrue(None != re.match(ur'/report/(?P<id>[0-9a-z]+)', urlPart.path))
+#       jsonResp = c.get(resp.url, headers = {'Accept': 'application/json'})
+#       print jsonResp.content
+#       self.assertEqual(jsonResp.status_code, 200)
+#       self.assertEqual(resp.content, json.dumps(self.days))
+#       jReport = json.loads(jsonResp.content)
+       resp = c.get(resp.url+'/page')
+       self.assertEqual(resp.status_code, 302)
        print resp.url
-       jsonResp = c.get(resp.url, headers = {'Accept': 'application/json'})
-       print jsonResp.content
-       self.assertEqual(jsonResp.status_code, 200)
-       self.assertEqual(resp.content, json.dumps(self.days))
-       jReport = json.loads(jsonResp.content)
-       hResp = c.get(resp.url, headers = {'Accept': 'text/html'})
+       resp = c.get(resp.url, headers = {'Accept': 'text/html'})
+       print resp.content
+       print resp
+       self.assertEqual(resp.status_code, 200)
        with open("static/test/performanceChart.html", 'w') as f:
-           f.write(hResp.content)
+           f.write(resp.content)
            f.close()
 

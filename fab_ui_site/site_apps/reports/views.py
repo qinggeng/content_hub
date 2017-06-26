@@ -6,6 +6,8 @@ from django.views import View
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 
+from prettyprint import pp
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.safestring import mark_safe
@@ -88,11 +90,38 @@ class Chart(View):
     def delete(self, request, *args, **kwargs):
         pass
 
+class ReportView(View):
+    def get(self, request, *args, **kwargs):
+        pass
+
 class ReportPage(View):
     def get(self, request, *args, **kwargs):
         reportId = kwargs.pop("id")
-        report = Report.get(id = reportId)
-        if report.pageUrl != null:
-            return HttpResponseRedirect(report.pageUrl)
-        else:
-            return HttpResponse(status = 404)
+        try:
+            report = Report.objects.get(id = reportId)
+            if report.pageUrl != None:
+                return HttpResponseRedirect(report.pageUrl)
+            else:
+                return HttpResponse('report page not found', status = 404)
+        except Exception, e:
+            return HttpResponse('report not found', status = 404)
+
+class PageView(View):
+    def renderPerformanceOnTestCasePage(self):
+        pass
+    def get(self, request, *args, **kwargs):
+        pageId = kwargs.pop("id")
+        try:
+            page = Page.objects.get(id = pageId).performanceontestcasepage
+            if None == page:
+                return HttpResponse('page not found', status = 404)
+            chartArgs = json.loads(ChartArg.objects.get(digest = page.chartArg).content)
+            slices = chartArgs['series']['slices']
+            tableData = reduce(
+                    lambda x, y: map(lambda a: x[a[0]] + [a[1]], enumerate(y)), 
+                    map(lambda x: x['data'], slices), 
+                    map(lambda x: [], range(len(slices[0]['data']))))
+            return HttpResponse('not implement yet', status = 500)
+        except Exception, e:
+            print e
+            return HttpResponse('page not found', status = 404)

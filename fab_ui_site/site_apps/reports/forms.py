@@ -70,8 +70,15 @@ class PerformanceChart(View):
         report = Report()
         report.form = request.path
         report.formArgs = request.body
-        self.makeReportPage(report)
-        return HttpResponseRedirect('/reports/{id}'.format(id = unicode(report.id)))
+        report.save()
+        report.pageUrl = self.makeReportPage(report, digest)
+        report.save()
+        return HttpResponseRedirect(u'/report/{id}'.format(id = unicode(report.id)))
 
-    def makeReportPage(self, report):
+    def makeReportPage(self, report, digest):
+        page = PerformanceOnTestCasePage()
+        page.reportId = report
+        page.chartArg = digest
+        page.save()
+        return u'/page/{id}'.format(id = unicode(page.id))
         pass

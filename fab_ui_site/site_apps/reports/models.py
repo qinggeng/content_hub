@@ -9,9 +9,14 @@ from simple_history.models import HistoricalRecords
 # Create your models here.
 class Page(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
-    uri = models.TextField(max_length = 65535, null = False)
-    content = models.TextField(blank = True)
+    uri = models.TextField(max_length = 65535, null = True)
     history = HistoricalRecords()
+#    class Meta:
+#        abstract = True
+
+class PerformanceOnTestCasePage(Page):
+    reportId = models.ForeignKey('Report', on_delete = models.SET_NULL, null = True)
+    chartArg = models.TextField(null = True)
 
 class PageContributors(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
