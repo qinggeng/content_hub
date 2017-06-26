@@ -10,7 +10,11 @@ from simple_history.models import HistoricalRecords
 class Page(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
     uri = models.TextField(max_length = 65535, null = True)
+    pageClass = models.TextField(max_length = 65535, null = True)
     history = HistoricalRecords()
+    def save(self, *args):
+        pageClass = type(self).__name__
+        models.Model.save(self, *args)
 #    class Meta:
 #        abstract = True
 
