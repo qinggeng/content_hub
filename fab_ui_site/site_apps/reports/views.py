@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.safestring import mark_safe
 
 from models import *
+from tables import make_dynamic_column_table_klass
 
 # Create your views here.
 import json
@@ -121,7 +122,16 @@ class PageView(View):
                     lambda x, y: map(lambda a: x[a[0]] + [a[1]], enumerate(y)), 
                     map(lambda x: x['data'], slices), 
                     map(lambda x: [], range(len(slices[0]['data']))))
+            print tableData
+            tableKlass = make_dynamic_column_table_klass(map(lambda x: x['tick'], slices))
+            #table = PerformanceOnTestCaseTable(tableData)
+            #table.table_class = table.get_table_class()
+
+            return render(
+                    request, 
+                    'performanceOnTestCase.html', 
+                    {'performanceOnTestCase': tableKlass(tableData)})
             return HttpResponse('not implement yet', status = 500)
         except Exception, e:
-            print e
+            raise
             return HttpResponse('page not found', status = 404)
