@@ -1,0 +1,2 @@
+- [] ReportFactory
+- [] 抽象一个图表层，封装echart(ChartFactory)

@@ -63,7 +63,7 @@ class PerformanceChart(View):
             'title': u'个人测试用例增量一览表',
             'xAxis': {'name': u'日期'},
             'yAxis': {'name': u'数量'},
-            'series': {'slices': slices, 'legends': list(authors)},
+            'series': {'slices': slices, 'style': {'legends': list(authors)}},
         }
         chart = Chart()
         digest = chart.saveChartArg(chartArgs)

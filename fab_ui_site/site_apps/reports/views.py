@@ -118,19 +118,23 @@ class PageView(View):
                 return HttpResponse('page not found', status = 404)
             chartArgs = json.loads(ChartArg.objects.get(digest = page.chartArg).content)
             slices = chartArgs['series']['slices']
+            legends = chartArgs['series']['style']['legends']
             tableData = reduce(
                     lambda x, y: map(lambda a: x[a[0]] + [a[1]], enumerate(y)), 
                     map(lambda x: x['data'], slices), 
                     map(lambda x: [], range(len(slices[0]['data']))))
-            print tableData
-            tableKlass = make_dynamic_column_table_klass(map(lambda x: x['tick'], slices))
-            #table = PerformanceOnTestCaseTable(tableData)
-            #table.table_class = table.get_table_class()
+            columns = map(lambda x: x['tick'], slices)
+            columns = ['NA'] + columns
+            tableData = map(lambda x: [x[0]] + x[1], zip(legends, tableData))
+            tableData = map(lambda x: dict(zip(columns, x)), tableData)
+            tableKlass = make_dynamic_column_table_klass(columns)
+            chartOptions = makeEchartOptions(chartArgs)
 
             return render(
                     request, 
                     'performanceOnTestCase.html', 
-                    {'performanceOnTestCase': tableKlass(tableData)})
+                    {'performanceOnTestCase': tableKlass(tableData),
+                        'chartOptions': mark_safe(json.dumps(chartOptions, ensure_ascii = False))})
             return HttpResponse('not implement yet', status = 500)
         except Exception, e:
             raise

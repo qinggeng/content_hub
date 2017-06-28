@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 
 def make_dynamic_column_table_klass(data):
     print data
-    attrs = map(lambda x:{x: tables.Column()}, data)
+    attrs = {x: tables.Column() for x in data}
     attrs['Meta'] = type(
             'Meta', 
             (), 

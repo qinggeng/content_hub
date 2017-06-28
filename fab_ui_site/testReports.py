@@ -50,8 +50,8 @@ class PerformaceReportTest(LiveServerTestCase):
        self.assertEqual(resp.status_code, 302)
        print resp.url
        resp = c.get(resp.url, headers = {'Accept': 'text/html'})
-       print resp.content
-       print resp
+#       print resp.content
+#       print resp
        self.assertEqual(resp.status_code, 200)
        with open("static/test/performanceChart.html", 'w') as f:
            f.write(resp.content)
