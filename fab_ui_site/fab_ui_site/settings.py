@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'simple_history',
     'site_apps.reports',
     'site_apps.api_stat',
+    'site_apps.batch_fab',
 ]
 
 MIDDLEWARE = [

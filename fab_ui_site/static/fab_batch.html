@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Phabricator批量编辑</title>
+<script src="/static/js/vue.min.js"></script>
+</head>
+<body>
+<div id="app">
+	<fabtable></fabtable>
+</div>
+
+<script>
+const fabtable = {
+	template: "<table><tbody><TR><TD>test</TD></TR></tbody></table>"
+}
+new Vue({
+  el: '#app',
+  components: {
+	  fabtable: fabtable,
+  },
+  data: {
+    message: 'Hello Vue.js!',
+  }
+})
+</script>
+</body>
+</html>
