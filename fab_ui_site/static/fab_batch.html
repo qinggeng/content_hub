@@ -7,13 +7,71 @@
 </head>
 <body>
 <div id="app">
-	<fabtable></fabtable>
+	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :headerStyle='headerStyle'></fabtable>
 </div>
 
 <script>
+var headerStyle = {
+	'border-style': 'solid',
+	'border-width': '1px',
+};
+
+var headerData = [
+	{value: '编号', accessor: 'id'},
+	{value: '标题', accessor: 'title'},
+	{value: '作者', accessor: 'author'},
+	{value: '优先级', accessor: 'priority'},
+	{value: '严重程度', accessor: 'severity'},
+];
+
+var rowData = [{id: '1', title: 'Test Task', author: 'tester', priority: 'Unbreak Now!', severity: 'Not a Bug'}];
+
+var fabtableTemplate = `
+<table>
+	<tbody>
+		<fabHeaderRow v-bind:headers='headers' :headerStyle='headerStyle'/>
+		<fabRow v-for='row in rows' :row='row' :columns='headers'/>
+	</tbody>
+</table>`;
+
+var fabHeaderRowTemplate = `
+<TR>
+<TH v-for='header in headers' style={{headerStyle}}>{{header.value}}</TH>
+</TR>
+`;
+
+var fabRowTemplate = `
+<TR>
+	<TD v-for='column in columns'>{{row | access(column)}}</TD>
+</TR>
+`;
+
+const fabHeaderRow = {
+	props: ['headers', 'headerStyle'],
+	template: fabHeaderRowTemplate,
+};
+
+const fabRow = {
+	props: ['columns', 'row'],
+	template: fabRowTemplate,
+	filters: 
+	{
+		access: function(row, column)
+		{
+			accessor = column.accessor;
+			return row[accessor];
+		}
+	}
+};
+
 const fabtable = {
-	template: "<table><tbody><TR><TD>test</TD></TR></tbody></table>"
-}
+	props: ['headers', 'rows', 'headerStyle'],
+	template: fabtableTemplate,
+	components: {
+		fabHeaderRow: fabHeaderRow,
+		fabRow: fabRow,
+	},
+};
 new Vue({
   el: '#app',
   components: {
@@ -21,6 +79,9 @@ new Vue({
   },
   data: {
     message: 'Hello Vue.js!',
+	visibleHeaders: headerData,
+	rows: rowData,
+	headerStyle: headerStyle,
   }
 })
 </script>
