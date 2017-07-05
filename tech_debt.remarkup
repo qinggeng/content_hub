@@ -1,2 +1,3 @@
 - [] ReportFactory
 - [] 抽象一个图表层，封装echart(ChartFactory)
+- [] 动态表格中，类型单元格，类型行，类型列的样式渲染和优先级的问题

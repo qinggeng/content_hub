@@ -7,13 +7,48 @@
 </head>
 <body>
 <div id="app">
-	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :headerStyle='headerStyle'></fabtable>
+	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
 </div>
 
 <script>
-var headerStyle = {
+"use strict"
+var extend = (base, deriving)=>
+{
+	var derived = JSON.parse(JSON.stringify(base));
+	for (var key in deriving)
+	{
+		derived[key] = deriving[key];
+	}
+	return derived;
+}
+
+var solid_border = {
 	'border-style': 'solid',
 	'border-width': '1px',
+};
+var cell_common_style = extend(solid_border, {
+	'padding-left': '15px',
+	'padding-right': '15px',
+	'vertical-align': 'center',
+});
+
+var header_style = extend(cell_common_style, {
+	'text-align': 'center',
+});
+
+var row_style = extend(cell_common_style, {
+});
+
+var table_styles = {
+	header: header_style,
+	row: row_style,
+	table: {'border-collapse': 'collapse'},
+	typed_cells: {//不同类型的单元格有不同的样式，优先级最高
+	},
+	typed_rows: {//不同类型的行有不同的样式，优先级高于row
+	},
+	typed_columns: {//不同类型的列有不同的样式，优先级高于
+	},
 };
 
 var headerData = [
@@ -27,45 +62,46 @@ var headerData = [
 var rowData = [{id: '1', title: 'Test Task', author: 'tester', priority: 'Unbreak Now!', severity: 'Not a Bug'}];
 
 var fabtableTemplate = `
-<table>
+<table :style='table_styles.table'>
 	<tbody>
-		<fabHeaderRow v-bind:headers='headers' :headerStyle='headerStyle'/>
-		<fabRow v-for='row in rows' :row='row' :columns='headers'/>
+		<fabHeaderRow v-bind:headers='headers' :header_style='table_styles.header'/>
+		<fabRow v-for='row in rows' :row='row' :columns='headers' :row_style='table_styles.row'/>
 	</tbody>
-</table>`;
+</table>
+`;
 
 var fabHeaderRowTemplate = `
 <TR>
-<TH v-for='header in headers' style={{headerStyle}}>{{header.value}}</TH>
+<TH v-for='header in headers' style='border-style: solid; border-width: 1px'> {{header.value}}</TH>
 </TR>
 `;
 
 var fabRowTemplate = `
 <TR>
-	<TD v-for='column in columns'>{{row | access(column)}}</TD>
+	<TD v-for='column in columns' :style='row_style'>{{row | access(column)}}</TD>
 </TR>
 `;
 
 const fabHeaderRow = {
-	props: ['headers', 'headerStyle'],
+	props: ['headers', 'header_style'],
 	template: fabHeaderRowTemplate,
 };
 
 const fabRow = {
-	props: ['columns', 'row'],
+	props: ['columns', 'row', 'row_style'],
 	template: fabRowTemplate,
 	filters: 
 	{
 		access: function(row, column)
 		{
-			accessor = column.accessor;
+			var accessor = column.accessor;
 			return row[accessor];
 		}
 	}
 };
 
 const fabtable = {
-	props: ['headers', 'rows', 'headerStyle'],
+	props: ['headers', 'rows', 'header_style', 'table_styles'],
 	template: fabtableTemplate,
 	components: {
 		fabHeaderRow: fabHeaderRow,
@@ -81,7 +117,7 @@ new Vue({
     message: 'Hello Vue.js!',
 	visibleHeaders: headerData,
 	rows: rowData,
-	headerStyle: headerStyle,
+	table_styles: table_styles,
   }
 })
 </script>
