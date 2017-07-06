@@ -51,12 +51,19 @@ var table_styles = {
 	},
 };
 
+var authorEnums = [
+	{val: 'author1', display: 'author1'},
+	{val: 'author2', display: 'author2'},
+	{val: 'author3', display: 'author3'},
+]
+
 var headerData = [
-	{value: '编号', accessor: 'id'},
-	{value: '标题', accessor: 'title'},
-	{value: '作者', accessor: 'author'},
-	{value: '优先级', accessor: 'priority'},
-	{value: '严重程度', accessor: 'severity'},
+	{value: '编号', accessor: 'id', editable: 'false'},
+	{value: '标题', accessor: 'title', editable: 'true', edit_type: 'text', editor_pattern: 'inplace'},
+	{value: '作者', accessor: 'author', editable: 'true', edit_type: 'enum', editor_pattern: 'inplace', onums: authorEnums },
+	{value: '优先级', accessor: 'priority', editable: 'true', edit_type: 'enum', editor_pattern: 'inplace'},
+	{value: '严重程度', accessor: 'severity', editable: 'true', edit_type: 'enum', editor_pattern: 'inplace'},
+	{value: '描述', accessor: 'description', editable: 'true', edit_type: 'text', editor_pattern: 'popup'},
 ];
 
 var rowData = [{id: '1', title: 'Test Task', author: 'tester', priority: 'Unbreak Now!', severity: 'Not a Bug'}];
@@ -78,9 +85,23 @@ var fabHeaderRowTemplate = `
 
 var fabRowTemplate = `
 <TR>
-	<TD v-for='column in columns' :style='row_style'>{{row | access(column)}}</TD>
+	<TD v-for='column in columns' :style='row_style' @click='click'>
+		{{row | access(column)}}
+	</TD>
 </TR>
 `;
+
+const fabCell = {
+	data: {
+		currentView: 'raw',
+	},
+	comopnents: {
+		raw: {
+			props: ['raw_data'],
+			template: `{{raw_data}}`,
+		},
+	},
+};
 
 const fabHeaderRow = {
 	props: ['headers', 'header_style'],
@@ -96,8 +117,13 @@ const fabRow = {
 		{
 			var accessor = column.accessor;
 			return row[accessor];
-		}
-	}
+		},
+	},
+	methods: {
+		click: function(ev)
+		{
+		},
+	},
 };
 
 const fabtable = {
@@ -108,6 +134,7 @@ const fabtable = {
 		fabRow: fabRow,
 	},
 };
+
 new Vue({
   el: '#app',
   components: {
