@@ -85,20 +85,34 @@ var fabHeaderRowTemplate = `
 
 var fabRowTemplate = `
 <TR>
-	<TD v-for='column in columns' :style='row_style' @click='click'>
-		{{row | access(column)}}
+	<TD v-for='column in columns' :style='row_style'>
+		<fabCell :raw_data='access(row, column)' :current_view='"raw"'/>
 	</TD>
 </TR>
 `;
 
 const fabCell = {
-	data: {
-		currentView: 'raw',
+	props: ['raw_data', 'current_view'],
+	template: `<component :is='current_view' :raw_data='raw_data' @request-edit='onRequestEdit'/>`,
+	methods: {
+		onRequestEdit: function(ev, args) {
+			console.log('sub element requesting edit');
+			this.current_view = 'highlighted';
+		}
 	},
-	comopnents: {
+	components: {
 		raw: {
 			props: ['raw_data'],
-			template: `{{raw_data}}`,
+			template: `<span @click='clicked'>{{raw_data}}</span>`,
+			methods: {
+				clicked: function(ev) {
+					this.$emit('request-edit');
+				}
+	},
+		},
+		highlighted: {
+			props: ['raw_data'],
+			template: `<span style='color: #FF0000'>{{raw_data}}</span>`,
 		},
 	},
 };
@@ -111,6 +125,9 @@ const fabHeaderRow = {
 const fabRow = {
 	props: ['columns', 'row', 'row_style'],
 	template: fabRowTemplate,
+	components: {
+		fabCell: fabCell,
+	},
 	filters: 
 	{
 		access: function(row, column)
@@ -122,6 +139,12 @@ const fabRow = {
 	methods: {
 		click: function(ev)
 		{
+			console.log('clicked');
+		},
+		access: function(row, column)
+		{
+			var accessor = column.accessor;
+			return row[accessor];
 		},
 	},
 };
