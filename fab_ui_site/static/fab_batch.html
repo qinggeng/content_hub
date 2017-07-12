@@ -8,6 +8,7 @@
 <body>
 <div id="app">
 	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
+	<search_editor :styles='search_editor_styles'></search_editor>
 </div>
 
 <script>
@@ -144,6 +145,28 @@ var headerData = [
 
 var rowData = [{id: '1', title: 'Test Task', author: '2', priority: 'Unbreak Now!', severity: 'Not a Bug', project: ['P1', 'P3'], deadline: 'Mon, 10 Jul 2017 23:07:22 GMT'}];
 
+const predicts = {
+	contains: ()=>{return {
+		'display': '包含',
+		'operand': 'text',
+	}; },
+};
+
+const criteriaDefines = {
+	fields: [
+		{
+			name: 'title', 
+			display：'标题', 
+			avalablePredicts: [
+				predicts.contains(),
+				// predicts.notContains,
+				// predicts.startsWith,
+				// predicts.endsWith,
+				// predicts.regex,
+			],
+		},
+	],
+};
 var fabtableTemplate = `
 <table :style='table_styles.table'>
 	<tbody>
@@ -165,6 +188,22 @@ var fabRowTemplate = `
 		<fabCell :raw_data='access(row, column)' :edit_type='column.edit_type' :data_traits='column' :current_view='"raw"'/>
 	</TD>
 </TR>
+`;
+
+
+
+const searchCriteriaTemplate = `
+<div :style='styles.frame'>
+	<div :style='styles.xbtn'>
+	Ⅹ
+	</div>
+</div>
+`;
+
+const searchEditorTemplate = `
+<div :style='styles.container'>
+	<search_criteria :styles='styles.criteria'/>
+</div>
 `;
 
 const fabCell = {
@@ -329,16 +368,62 @@ const fabtable = {
 	},
 };
 
+const searchEditorStyles = {
+	container: extend(solid_border, {
+		'margin': '0 0 0 0',
+		'display': 'flex',
+		'min-height': '40px',
+		'flex-direction': 'row',
+		'padding': '4px',
+	}),
+	criteria: {
+		frame: extend(solid_border, {
+			display: 'flex',
+			'flex-direction': 'row',
+			'align-items': 'center',
+			
+		}),
+		xbtn: extend(solid_border, {
+			width: '18px',
+			height: '18px',
+			display: 'flex',
+			'justify-content': 'center',
+			'align-items': 'center',
+			background: '#FF0000',
+			color: '#FFFFFF',
+			'border-radius': '3px',
+			'font-size': '12px',
+		}),
+	}
+};
+
+const searchCriteria =
+{
+	props: ['styles'],
+	template: searchCriteriaTemplate,
+};
+
+const searchEditor = 
+{
+	props: ['styles'],
+	template: searchEditorTemplate,
+	components: {
+		search_criteria: searchCriteria,
+	},
+};
+
 new Vue({
   el: '#app',
   components: {
 	  fabtable: fabtable,
+	  search_editor: searchEditor,
   },
   data: {
     message: 'Hello Vue.js!',
 	visibleHeaders: headerData,
 	rows: rowData,
 	table_styles: table_styles,
+	search_editor_styles: searchEditorStyles,
   }
 })
 </script>
