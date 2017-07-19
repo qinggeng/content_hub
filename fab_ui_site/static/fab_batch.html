@@ -7,11 +7,14 @@
 </head>
 <body>
 <div id="app">
+  <fab_setting></fab_setting>
 	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
 	<search_editor :criterias='searchCriteria' :styles='search_editor_styles'></search_editor>
 </div>
 
 <script src='foundations.js'></script>
+<script src='messages.js'></script>
+<script src='fab_setting.vue.js'></script>
 <script src='data_editor.vue.js'></script>
 <script src='fab_table.vue.js'></script>
 <script src='search_criteria.vue.js'></script>
@@ -30,6 +33,7 @@ new Vue({
   components: {
 	  fabtable: fabtable,
 	  search_editor: searchEditor,
+    fab_setting: fab_setting,
   },
   data: {
     message: 'Hello Vue.js!',

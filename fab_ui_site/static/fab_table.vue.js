@@ -112,4 +112,15 @@ const fabtable = {
 		fabHeaderRow: fabHeaderRow,
 		fabRow: fabRow,
 	},
+  methods: {
+    onApiPrefixChanged: function (payload) {
+      console.log(j2s(payload));
+    },
+  },
+  created: function() {
+    messageCenter.subscribe(kApiPrefixChanged.id, this.onApiPrefixChanged.bind(this), this);
+  },
+  beforeDestroy: function () {
+    //TODO unsubscribe message
+  }
 };

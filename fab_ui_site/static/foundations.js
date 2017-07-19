@@ -7,6 +7,8 @@ var extend = (base, deriving) =>
 	}
 	return derived;
 }
+
+const j2s = JSON.stringify;
 /*
 */
 //function strptime(str, fmt)
