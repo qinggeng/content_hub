@@ -52,8 +52,8 @@ const dataEditor = (function(){
 				}
 				catch(ex)
 				{
-					console.log(traits.edit_type);
-					console.log(ex);
+					//console.log(traits.edit_type);
+					//console.log(ex);
 				}
 				return val;
 			},
@@ -62,6 +62,8 @@ const dataEditor = (function(){
 			},
 			onEdited: function(args) {
 				var val = args;
+				const oldVal = this.raw_data;
+				this.$emit('value-changed', {last: oldVal, current: val});
 				this.raw_data = val;
 				this.display_data = this.formatVal(val, this.data_traits);
 				this.current_view = 'raw';

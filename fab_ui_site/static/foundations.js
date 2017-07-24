@@ -1,4 +1,4 @@
-var extend = (base, deriving) =>
+const extend = (base, deriving) =>
 {
 	var derived = JSON.parse(JSON.stringify(base));
 	for (var key in deriving)
@@ -10,7 +10,7 @@ var extend = (base, deriving) =>
 /*
 */
 //function strptime(str, fmt)
-var strptime = (str, fmt) =>
+const strptime = (str, fmt) =>
 {
 	const placeHolders = [
 		[(x, y)=>x.setYear(y), '%Y', '(\\d{2,4})'],
@@ -37,6 +37,8 @@ var strptime = (str, fmt) =>
 	}
 	return d;
 }
+
+const j2s = JSON.stringify;
 
 var solid_border = {
 	'border-style': 'solid',
