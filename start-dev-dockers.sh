@@ -1,6 +1,6 @@
 db=content_db
 app=content_app
-port=8000
+port=8001
 if [ -n "$(lsof -i:$port)" ]
 then
   echo port $port is used, failed

@@ -10,14 +10,17 @@
   <fab_setting></fab_setting>
 	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
 	<search_editor :criterias='searchCriteria' :styles='search_editor_styles'></search_editor>
+  <status_indicator/>
 </div>
 
 <script src='foundations.js'></script>
 <script src='messages.js'></script>
+<script src='store.js'></script>
 <script src='fab_setting.vue.js'></script>
 <script src='data_editor.vue.js'></script>
 <script src='fab_table.vue.js'></script>
 <script src='search_criteria.vue.js'></script>
+<script src='status_bar.vue.js'></script>
 <script>
 "use strict"
 
@@ -34,6 +37,7 @@ new Vue({
 	  fabtable: fabtable,
 	  search_editor: searchEditor,
     fab_setting: fab_setting,
+    status_indicator: status_bar,
   },
   data: {
     message: 'Hello Vue.js!',

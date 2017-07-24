@@ -37,14 +37,81 @@ var projects = [
 ]
 
 var headerData = [
-	{value: '编号', accessor: 'id', editable: 'false'},
-	{value: '标题', accessor: 'title', editable: 'true', edit_type: 'textEdit', editor_pattern: 'inplace'},
-	{value: '作者', accessor: 'author', editable: 'true', edit_type: 'choice', editor_pattern: 'inplace', choices: authorEnums },
-	{value: '优先级', accessor: 'priority', editable: 'true', edit_type: 'choice', editor_pattern: 'inplace'},
-	{value: '严重程度', accessor: 'severity', editable: 'true', edit_type: 'choice', editor_pattern: 'inplace'},
-	{value: '项目', accessor: 'project', editable: 'true', edit_type: 'multiple_choise', editor_pattern: 'inplace', choices: projects},
-	{value: '计划截止时间', accessor: 'deadline', editable: 'true', edit_type: 'datetime', editor_pattern: 'inplace', choices: projects},
-	{value: '描述', accessor: 'description', editable: 'true', edit_type: 'textEdit', editor_pattern: 'popup'},
+	{value: '编号', accessor: 'tid', editable: false},
+	{value: '标题', accessor: 'task', editable: true, edit_type: 'textEdit', editor_pattern: 'inplace'},
+	{
+    value: '作者', 
+    accessor: (row, traits)=> 
+    {
+      let val = row.author;
+      try
+      {
+        return traits.choices.filter(x => x.display == val)[0].val;
+      }
+      catch(ex)
+      {
+        return val;
+      }
+    }, 
+    editable: false, 
+    edit_type: 'choice', 
+    editor_pattern: 'inplace', 
+    get choices()
+    { 
+      let ret = store.configCache.users.map(x=>
+      {
+        return {val: x.userName, display: x.realName};
+      });
+      return ret;
+    }, 
+  },
+	{value: '优先级', accessor: 'priority', editable: true, edit_type: 'choice', editor_pattern: 'inplace'},
+	{value: '严重程度', accessor: 'severity', editable: true, edit_type: 'choice', editor_pattern: 'inplace'},
+	{
+    value: '项目', 
+    accessor: function (row, traits) 
+    {
+      try
+      {
+        let tags = row.tags.split(',').map(x=> x.trim());
+        let values = tags.map(x=>traits.project_name_map[x]);
+        console.log(values);
+        return values;
+      }
+      catch(ex)
+      {
+        console.log(ex);
+        return '';
+      }
+    }, 
+    get project_name_map() {
+      let ret = {};
+      for (var val of this.choices)
+      {
+        ret[val.display] = val.val;
+      }
+      return ret;
+    },
+    editable: true, 
+    edit_type: 'multiple_choise', 
+    editor_pattern: 'inplace', 
+    get choices() {
+      let ret = store.configCache.projects.map(x =>
+      {
+        return {val: x.phid, display: x.name};
+      });
+      return ret;
+    },
+  },
+	{
+    value: '计划截止时间', 
+    accessor: 'deadline', 
+    editable: true, 
+    edit_type: 'datetime', 
+    editor_pattern: 'inplace',
+    default_value: 'TBD',
+  },
+	{value: '描述', accessor: 'description', editable: true, edit_type: 'textEdit', editor_pattern: 'popup'},
 ];
 
 var fabtableTemplate = `
@@ -88,7 +155,14 @@ const fabRow = {
 		access: function(row, column)
 		{
 			var accessor = column.accessor;
-			return row[accessor];
+      if (typeof(accessor) === 'string')
+      {
+        return row[accessor];
+      }
+      if (typeof(accessor) === 'function')
+      {
+        return accessor(row);
+      }
 		},
 	},
 	methods: {
@@ -99,8 +173,14 @@ const fabRow = {
 		access: function(row, column)
 		{
 			var accessor = column.accessor;
-			var val = row[accessor];
-			return val;
+      if (typeof(accessor) === 'string')
+      {
+        return row[accessor];
+      }
+      if (typeof(accessor) === 'function')
+      {
+        return accessor(row, column);
+      }
 		},
 	},
 };
@@ -116,9 +196,13 @@ const fabtable = {
     onApiPrefixChanged: function (payload) {
       console.log(j2s(payload));
     },
+    onSearchUpdated: function (payload) {
+      this.rows = payload;
+    },
   },
   created: function() {
     messageCenter.subscribe(kApiPrefixChanged.id, this.onApiPrefixChanged.bind(this), this);
+    messageCenter.subscribe(kSearchUpdated.id, this.onSearchUpdated.bind(this), this);
   },
   beforeDestroy: function () {
     //TODO unsubscribe message

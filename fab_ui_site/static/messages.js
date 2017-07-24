@@ -2,12 +2,31 @@ const kApiPrefixChanged = {
   id: 'api_prefix_changed',
 };
 
+const kUserListLoaded = {
+  id: 'user_changed',
+};
+
+const kProjectsLoaded = {
+  id: 'projects_changed',
+};
+
+const kSearchUpdated = {
+  id: 'search_updated',
+};
+
+const kBackgroundProgressBegin = {
+  id: 'background_progress_begin',
+};
+
+const kBackgroundProgressEnd = {
+  id: 'background_progress_end',
+};
+
 const messageCenter = {
   subscribe: function(message_type, handler, target) {
     if (false == (message_type in this.listenedMessages))
     {
-      this.listenedMessages[message_type] = {},
-      window.addEventListener("message", this.dispatchMessage.bind(this), true);
+      this.listenedMessages[message_type] = {};
     }
     this.listenedMessages[message_type][target] = handler;
   },
@@ -42,3 +61,4 @@ const messageCenter = {
   },
   listenedMessages: {},
 };
+window.addEventListener("message", messageCenter.dispatchMessage.bind(messageCenter), true);
