@@ -46,7 +46,13 @@ const dataEditor = (function(){
 
   const dataEditor = {
     props: ['raw_data', 'current_view', 'data_traits'],
-    template: `<component :is='current_view' :display_data='formatVal(raw_data, data_traits)' @request-edit='onRequestEdit' @edited='onEdited' :raw_data='raw_data' :data_traits='data_traits'/>`,
+    template: `<component 
+                 :is='current_view' 
+                 :display_data='formatVal(raw_data, data_traits)' 
+                 @request-edit='onRequestEdit' 
+                 @edited='onEdited' 
+                 :raw_data='raw_data' 
+                 :data_traits='data_traits'/>`,
     methods: {
       formatVal(val, traits)
       {
@@ -61,12 +67,14 @@ const dataEditor = (function(){
         return val;
       },
       onRequestEdit: function(ev, args) {
-        if (undefined != this.data_traits.editable && this.data_traits.editable === true)
+        if (undefined != this.data_traits.editable 
+            && this.data_traits.editable === true)
         {
           this.current_view = this.data_traits.edit_type;
         }
       },
       onEdited: function(args) {
+        this.$emit('edited', {current: args, orig: this.raw_data});
         var val = args;
         this.raw_data = val;
         this.display_data = this.formatVal(val, this.data_traits);

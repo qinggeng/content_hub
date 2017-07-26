@@ -3,7 +3,7 @@ let status_bar = (()=>{
 let template = `
 <div :style = 'defaultStyles.frame'>
   <div :style = 'appliedStyles.loading_indicator'>
-    <span>......</span>
+    <span>{{'========================================='.slice(0, this.time_count)}}</span>
   </div>
 </div>
 `;
@@ -27,7 +27,7 @@ let loading_indicator_style = {
   left: 0,
   right: 0,
   display: 'flex',
-  justifyContent: 'center',
+  justifyContent: 'flex-start',
   alignItems: 'center',
 };
 
@@ -44,6 +44,7 @@ let component = {
         loading_indicator: extend(loading_indicator_style, {}),
       },
       backgroundProgressCount: 0,
+      time_count: 0,
     };
   },
   computed: {
@@ -66,6 +67,10 @@ let component = {
     messageCenter.subscribe(kBackgroundProgressEnd.id, (()=>{
       this.backgroundProgressCount -= 1;
     }).bind(this), this);
+    window.setInterval(((ev) =>
+    {
+      this.time_count = (this.time_count + 1) % 40;
+    }).bind(this), 100);
   },
 };
 return component;

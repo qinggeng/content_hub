@@ -9,6 +9,7 @@ var extend = (base, deriving) =>
 }
 
 const j2s = JSON.stringify;
+const s2j = JSON.parse;
 /*
 */
 //function strptime(str, fmt)

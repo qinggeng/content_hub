@@ -36,6 +36,8 @@ var projects = [
 	{val: 'P3', display: 'project3'},
 ]
 
+let headerData = fab_column_settings;
+/*
 var headerData = [
 	{value: '编号', accessor: 'tid', editable: false},
 	{value: '标题', accessor: 'task', editable: true, edit_type: 'textEdit', editor_pattern: 'inplace'},
@@ -65,8 +67,50 @@ var headerData = [
       return ret;
     }, 
   },
-	{value: '优先级', accessor: 'priority', editable: true, edit_type: 'choice', editor_pattern: 'inplace'},
-	{value: '严重程度', accessor: 'severity', editable: true, edit_type: 'choice', editor_pattern: 'inplace'},
+	{
+    value: '优先级', 
+    accessor: (row, traits)=> 
+    {
+      let val = row.priority;
+      try
+      {
+        return traits.choices.filter(x => x.display == val)[0].val;
+      }
+      catch(ex)
+      {
+        return val;
+      }
+    }, 
+    editable: true, 
+    edit_type: 'choice', 
+    editor_pattern: 'inplace',
+    get choices() 
+    {
+      return store.configCache.priority;
+    },
+  },
+	{
+    value: '严重程度', 
+    accessor: (row, traits)=> 
+    {
+      let val = row.severity;
+      try
+      {
+        return traits.choices.filter(x => x.display == val)[0].val;
+      }
+      catch(ex)
+      {
+        return val;
+      }
+    }, 
+    editable: true, 
+    edit_type: 'choice', 
+    editor_pattern: 'inplace',
+    get choices() 
+    {
+      return store.configCache.severity;
+    },
+  },
 	{
     value: '项目', 
     accessor: function (row, traits) 
@@ -112,7 +156,7 @@ var headerData = [
     default_value: 'TBD',
   },
 	{value: '描述', accessor: 'description', editable: true, edit_type: 'textEdit', editor_pattern: 'popup'},
-];
+]; */
 
 var fabtableTemplate = `
 <table :style='table_styles.table'>
@@ -132,7 +176,11 @@ var fabHeaderRowTemplate = `
 var fabRowTemplate = `
 <TR>
 	<TD v-for='column in columns' :style='row_style'>
-		<fabCell :raw_data='access(row, column)' :data_traits='column' :current_view='"raw"'/>
+		<fabCell 
+      :raw_data='access(row, column)' 
+      :data_traits='column' 
+      @edited='((r, c, v)=>{onEdited(r, c, v)}).bind(undefined, row, column)'
+      :current_view='"raw"'/>
 	</TD>
 </TR>
 `;
@@ -182,6 +230,16 @@ const fabRow = {
         return accessor(row, column);
       }
 		},
+    onEdited: function(row, column, args) {
+      try
+      {
+        column.update(row, args.current);
+      }
+      catch(ex)
+      {
+        console.log(ex);
+      }
+    },
 	},
 };
 
@@ -197,12 +255,13 @@ const fabtable = {
       console.log(j2s(payload));
     },
     onSearchUpdated: function (payload) {
-      this.rows = payload;
+      // this.rows = payload;
+      this.rows = store.searchResult;
     },
   },
   created: function() {
     messageCenter.subscribe(kApiPrefixChanged.id, this.onApiPrefixChanged.bind(this), this);
-    messageCenter.subscribe(kSearchUpdated.id, this.onSearchUpdated.bind(this), this);
+    messageCenter.subscribe(kSearchResultUpdated.id, this.onSearchUpdated.bind(this), this);
   },
   beforeDestroy: function () {
     //TODO unsubscribe message
