@@ -180,16 +180,27 @@ let fab_column_settings = (()=>
         return row.deadline;
       }
     }, 
-    editable: true, 
-    edit_type: 'datetime', 
-    editor_pattern: 'inplace',
-    default_value: 'TBD',
+    editable       : true,
+    edit_type      : 'datetime',
+    editor_pattern : 'inplace',
+    default_value  : 'TBD',
     update         : function(row, val) {
-      let dt = new Date(val);
-        let lt = dt.getTime();
-        let t = lt + dt.getTimezoneOffset() * 60 * 1000;
-        dt.setTime(t);
-      row.deadline = strftime(dt, "%Y-%m-%d %H:%M");
+      try
+      {
+        if (val == 'TBD')
+        {
+          throw 'TBD';
+        }
+        let dt = new Date(val);
+          let lt = dt.getTime();
+          let t = lt + dt.getTimezoneOffset() * 60 * 1000;
+          dt.setTime(t);
+        row.deadline = strftime(dt, "%Y-%m-%d %H:%M");
+      }
+      catch(ex)
+      {
+        row.deadline = 'TBD';
+      }
     },
   };
   let descriptionColumn = {
