@@ -7,18 +7,27 @@
 </head>
 <body>
 <div id="app">
+  <fab_setting></fab_setting>
 	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
 	<search_editor :criterias='searchCriteria' :styles='search_editor_styles'></search_editor>
+  <status_indicator/>
 </div>
 
 <script src='foundations.js'></script>
+<script src='defaultData.js'></script>
+<script src='fab_column_settings.js'></script>
+<script src='messages.js'></script>
+<script src='store.js'></script>
+<script src='fab_setting.vue.js'></script>
 <script src='data_editor.vue.js'></script>
 <script src='fab_table.vue.js'></script>
 <script src='search_criteria.vue.js'></script>
+<script src='status_bar.vue.js'></script>
 <script>
 "use strict"
 
-const rowData = [{id: '1', title: 'Test Task', author: '2', priority: 'Unbreak Now!', severity: 'Not a Bug', project: ['P1', 'P3'], deadline: 'Mon, 10 Jul 2017 23:07:22 GMT'}];
+// const rowData = [{id: '1', title: 'Test Task', author: '2', priority: 'Unbreak Now!', severity: 'Not a Bug', project: ['P1', 'P3'], deadline: 'Mon, 10 Jul 2017 23:07:22 GMT'}];
+const rowData = store.searchResult;
 
 const criteriaData = [
 	{operator: 'contains', operand: 'foo', operate_on: 'title'},
@@ -30,6 +39,8 @@ new Vue({
   components: {
 	  fabtable: fabtable,
 	  search_editor: searchEditor,
+    fab_setting: fab_setting,
+    status_indicator: status_bar,
   },
   data: {
     message: 'Hello Vue.js!',
