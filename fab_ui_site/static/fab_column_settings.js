@@ -165,11 +165,32 @@ let fab_column_settings = (()=>
   };
   let deadlineColumn = {
     value: '计划截止时间', 
-    accessor: 'deadline', 
+    accessor: function (row, traits) {
+      try
+      {
+        let dt = strptime(row.deadline,  "%Y-%m-%d %H:%M");
+        let t = dt.getTime();
+        let lt = t - dt.getTimezoneOffset() * 60 * 1000;
+        dt.setTime(lt);
+        // dt.setHours(dt.getHours() + dt.getTimezoneOffset() /  60);
+        return strftime(dt, "%Y-%m-%d %H:%M");
+      }
+      catch(ex)
+      {
+        return row.deadline;
+      }
+    }, 
     editable: true, 
     edit_type: 'datetime', 
     editor_pattern: 'inplace',
     default_value: 'TBD',
+    update         : function(row, val) {
+      let dt = new Date(val);
+        let lt = dt.getTime();
+        let t = lt + dt.getTimezoneOffset() * 60 * 1000;
+        dt.setTime(t);
+      row.deadline = strftime(dt, "%Y-%m-%d %H:%M");
+    },
   };
   let descriptionColumn = {
     value          : '描述',
