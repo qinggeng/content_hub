@@ -38,6 +38,10 @@ const kStatusLoaded = {
   id: 'status_config_loaded',
 };
 
+const kRequestSearchUpdate = {
+  id: 'request_search_update',
+};
+
 const messageCenter = {
   subscribe: function(message_type, handler, target) {
     if (false == (message_type in this.listenedMessages))

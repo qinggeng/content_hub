@@ -2,11 +2,19 @@
 // import data_editor.vue
 
 const searchEditorStyles = {
-	container: extend(solid_border, {
-		'margin': '0 0 0 0',
+  container: extend(solid_border, {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    justifyContent: 'center',
+  }),
+  action_bar: extend({}, {
+  }),
+	criteria_container: extend(solid_border, {
 		'display': 'flex',
 		'min-height': '40px',
 		'flex-direction': 'row',
+    justifyContent: 'flex-start',
 		'padding': '4px',
 	}),
 	criteria: {
@@ -34,84 +42,9 @@ const searchEditorStyles = {
 	}
 };
 
-const predicts = {
-	get contains() 
-	{
-		return {
-			'key': 'contains',
-			'display': '包含',
-		}; 
-	},
-	get higher_than()
-	{
-		return {
-			'key': 'higher_than',
-			'display': '高于',
-		}; 
-	},
-};
-
-const criteriaDefines = {
-	predicts: predicts,
-	fields: [
-		{
-			name: 'title', 
-			display: '标题', 
-			available_predicts: [
-				predicts.contains,
-				// predicts.notContains,
-				// predicts.startsWith,
-				// predicts.endsWith,
-				// predicts.regex,
-			],
-			data_traits: {
-				edit_type: 'textEdit',
-			},
-			applyValue: function(val) {
-				return val;
-			}
-		},
-		{
-			name: 'priority', 
-			display: '优先级', 
-			available_predicts: [
-				predicts.higher_than,
-				// predicts.lowerThan,
-				// predicts.equals,
-				// predicts.higherOrEqual,
-				// predicts.lowerOrEqual,
-				// predicts.notContains,
-				// predicts.startsWith,
-				// predicts.endsWith,
-				// predicts.regex,
-			],
-			data_traits: {
-				edit_type: 'choice',
-				choices: [
-					{val: 100, display: 'Unbreak Now!'},
-					{val: 90, display: 'Needs triage'},
-					{val: 80, display: 'High'},
-					{val: 70, display: 'Normal'},
-					{val: 60, display: 'Low'},
-					{val: 50, display: 'Wishlist'},
-				],
-			},
-			applyValue: function(val) {
-				var filtered = this.data_traits.choices.filter(x=> x.val === val);
-				if (filtered.length == 0)
-				{
-					return this.data_traits.choices[0].val;
-				}
-				return val;
-			}
-		},
-	],
-};
-
-const fieldTraits = {
-	edit_type: 'choice',
-	choices: criteriaDefines.fields.map(x => {return {val: x.name, display: x.display};}),
-};
+let predict = field_criteria_defines.predicts;
+let criteriaDefines = field_criteria_defines.criteriaDefines;
+let fieldTraits = field_criteria_defines.fieldTraits;
 
 const searchCriteriaTemplate = `
 <div :style='styles.frame'>
@@ -119,15 +52,16 @@ const searchCriteriaTemplate = `
 		:raw_data='criteria.operate_on' 
 		:data_traits='fieldTraits' 
 		:current_view='"raw"'
-	 	@value-changed='onFieldChosen'/>
+	 	@edited='onFieldChosen'/>
 	<data_editor 
 		:raw_data='criteria.operator' 
-		:data_traits='operator_traits' 
+		:data_traits='operator_traits'
+    @edited='onPredictChoosen'
 		:current_view='"raw"'/>
 	<data_editor 
 		:raw_data='criteria.operand' 
-		:data_traits='current_field.data_traits' 
-		:current_view='"raw"' @value-changed='onCriteriaChanged'/>
+		:data_traits='current_field_trait || current_field.data_traits' 
+		:current_view='"raw"' @edited='onCriteriaChanged'/>
 	<!-- <span :style='styles.sector'>{{criteria.operand}}</span> -->
 	<div :style='styles.xbtn' @click='requestRemoveCriteria'>
 	Ⅹ
@@ -137,10 +71,19 @@ const searchCriteriaTemplate = `
 
 const searchEditorTemplate = `
 <div :style='styles.container'>
-	<search_criteria 
-		v-for='criteria in criterias' 
-		:styles='styles.criteria' :criteria='criteria' 
-		@request-remove-criteria='removeCriteria'/>
+  <div :style='styles.actionbar'>
+    <input type='button' value='执行' @click='onTriggerSearch'/>
+    <input type='button' value='重置'/>
+  </div>
+  <div :style='styles.criteria_container'>
+    <input type='button' value = '新增' @click = 'onNewCriteria'/>
+    <search_criteria 
+      v-for='criteria in criterias' 
+      :styles='styles.criteria' 
+      :criteria='criteria' 
+      @criteria-changed='((c, v)=>{updateCriteria(c, v)}).bind(undefined, criteria)'
+      @request-remove-criteria='removeCriteria'/>
+  </div>
 </div>
 `;
 
@@ -163,6 +106,12 @@ const searchCriteria =
 	},
 	filters: {
 	},
+  data: function() 
+  {
+    return {
+      current_field_trait: 0,
+    };
+  },
 	methods: {
 		fieldDisplay: function (val) 
 		{
@@ -192,11 +141,16 @@ const searchCriteria =
 		{
 			return {
 				edit_type: 'choice',
+        editable: true,
 				choices: val.map(x=>{return {val: x.key, display: x.display};}),
 			};
 		},
 
 		onFieldChosen: function(val) {
+      if (val.current == val.origin)
+      {
+        return;
+      }
 			const criteria = this.criteria;
 			//TODO send change message
 			criteria.operate_on = val.current;
@@ -209,13 +163,32 @@ const searchCriteria =
 				return;
 			}
 			criteria.operator = predict.key;
-			criteria.operand = fieldDefine.applyValue(criteria.operand);
+      if (undefined !== fieldDefine.field_editors)
+      {
+        criteria.operand = 
+          fieldDefine.field_editors[predict.key].apply_value(criteria.operand);
+      }
+      else
+      {
+        criteria.operand = fieldDefine.applyValue(criteria.operand);
+      }
 		},
 
-		onCriteriaChanged: function (val){
-			const criteria = this.criteria;
+		onCriteriaChanged: function (val)
+    {
+      if (val.current == val.origin)
+      {
+        return;
+      }
+			const criteria = extend(this.criteria);
 			//TODO send change message
-			criteria.operand = val.current;
+			criteria.operand = val.current; 
+      let payload = {
+        current: criteria,
+        origin: this.criteria,
+      };
+      this.criteria = criteria;
+      this.$emit('criteria-changed', payload);
 		},
 
 		requestRemoveCriteria: function (ev) {
@@ -224,8 +197,15 @@ const searchCriteria =
 
 		onPredictChoosen: function(val) {
 			this.criteria.operator = val.current;
+			let fieldDefine = this.current_field;
+      if (undefined !== fieldDefine.field_editors)
+      {
+        this.current_field_trait = fieldDefine.field_editors[val.current].data_traits;
+        this.criteria.operand = 
+          fieldDefine.field_editors[val.current].apply_value(this.criteria.operand);
+      }
 		},
-	},
+	},// end of methods
 
 	computed: {
 		current_field: {
@@ -268,12 +248,26 @@ const searchEditor =
 		search_criteria: searchCriteria,
 	},
 	methods: {
+    updateCriteria: function(c, v)
+    {
+      c.operate_on = v.current.operate_on;
+      c.operand = v.current.operand;
+      c.operator = v.current.operator;
+    },
 		removeCriteria(criteria) {
 			let criterias = this.criterias;
 			var index = criterias.indexOf(criteria);
 			let newCrierias = criterias.filter(x => x !== criteria);
 			this.criterias = newCrierias;
 		},
+    onTriggerSearch: function(ev) {
+      this.$emit('search-triggered', this.criterias);
+    },
+    onNewCriteria: function(ev) {
+			let newCriterias = s2j(j2s(this.criterias));
+      newCriterias.push({operator: 'contains', operand:'XXX', operate_on: 'title'});
+			this.criterias = newCriterias;
+    },
 	},
 };
 

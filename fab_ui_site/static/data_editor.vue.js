@@ -13,7 +13,7 @@ const dataEditor = (function(){
       return val;
     },
     textEdit: (val, traits)=>{return val},
-    multiple_choise: (val, traits)=> {
+    multiple_choice: (val, traits)=> {
       var choices = traits.choices.reduce((x, y)=>{x[y.val]=y.display; return x}, {});
       return val.map(x=> choices[x]).join(', ');
     },
@@ -123,7 +123,7 @@ const dataEditor = (function(){
           <option v-for = 'opt of data_traits.choices' :value='opt.val'>{{opt.display}}</oitpion>
           </select>`,
       },
-      multiple_choise: {
+      multiple_choice: {
         props: ['display_data', 'raw_data', 'data_traits'],
         mounted: function(el) {
           this.$el.focus();

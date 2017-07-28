@@ -149,7 +149,7 @@ let fab_column_settings = (()=>
       return ret;
     },
     editable: true, 
-    edit_type: 'multiple_choise', 
+    edit_type: 'multiple_choice', 
     editor_pattern: 'inplace', 
     get choices() {
       let ret = store.configCache.projects.map(x =>

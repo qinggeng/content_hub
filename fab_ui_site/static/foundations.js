@@ -61,8 +61,6 @@ let strftime = (dt, fmt)=>
   return fmt;
 }
 
-const j2s = JSON.stringify;
-
 var solid_border = {
   'border-style': 'solid',
   'border-width': '1px',

@@ -44,7 +44,7 @@ const fab_setting = {
         };
       },
     },
-  },
+  }, // end of computed
   methods: {
     api_prefix_changed: function(ev) {
       this.api_prefix = ev.target.value;
@@ -200,7 +200,7 @@ const fab_setting = {
         });
         console.log(ex);
       });
-    },
+    },// end of on_commit_change
     on_update_config: function (ev) 
     {
       this.updateUserConfig();
@@ -208,11 +208,66 @@ const fab_setting = {
       this.updateConfig();
       this.updateSearch();
     },
-  },
+  },// end of methods
   data: function() {
     return {
       api_prefix: 'http://192.168.10.34:8020/api/',
     };
   },
+  created: function ()
+  {
+    let messageHandler = (payload)=> 
+    {
+      messageCenter.publish({
+        type: kBackgroundProgressBegin.id, 
+        payload: {},
+      });
+      fetch(
+        this.apis.searches, 
+        {
+          method: 'POST',
+          body: j2s(payload),
+          'content-type': 'application/json',
+        })
+      .then(resp=>
+      {
+        if(resp.ok)
+        {
+          return resp.text();
+        }
+        throw new 'can not get search result';
+      })
+      .then(ids=>{
+        return fetch(this.apis.id2j + '?ids=' + ids.trim());
+      })
+      .then(resp => 
+      {
+        messageCenter.publish({
+          type: kBackgroundProgressEnd.id, 
+          payload: {},
+        });
+        if (resp.ok)
+        {
+          return resp.json();
+        }
+        throw('search error');
+      })
+      .then(result =>
+      {
+        messageCenter.publish({
+          type: kSearchUpdated.id,
+          payload: result,
+        });
+      })
+      .catch(ex=>{})
+      .done();
+    };
+    messageHandler = messageHandler.bind(this);
+    messageCenter.subscribe(
+        kRequestSearchUpdate,
+        messageHandler,
+        this);
+  },
   template: template,
 };
+

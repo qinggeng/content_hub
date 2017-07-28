@@ -8,7 +8,10 @@
 <body>
 <div id="app">
   <fab_setting></fab_setting>
-	<search_editor :criterias='searchCriteria' :styles='search_editor_styles'></search_editor>
+	<search_editor 
+    @search-triggered='onSearchTriggered'
+    :criterias='searchCriteria' 
+    :styles='search_editor_styles'></search_editor>
 	<fabtable v-bind:headers='visibleHeaders' :rows='rows' :table_styles='table_styles'></fabtable>
   <status_indicator/>
 </div>
@@ -21,12 +24,12 @@
 <script src='fab_setting.vue.js'></script>
 <script src='data_editor.vue.js'></script>
 <script src='fab_table.vue.js'></script>
+<script src='field_criteria_defines.js'></script>
 <script src='search_criteria.vue.js'></script>
 <script src='status_bar.vue.js'></script>
 <script>
 "use strict"
 
-// const rowData = [{id: '1', title: 'Test Task', author: '2', priority: 'Unbreak Now!', severity: 'Not a Bug', project: ['P1', 'P3'], deadline: 'Mon, 10 Jul 2017 23:07:22 GMT'}];
 const rowData = store.searchResult;
 
 const criteriaData = [
@@ -42,13 +45,68 @@ new Vue({
     fab_setting: fab_setting,
     status_indicator: status_bar,
   },
-  data: {
-    message: 'Hello Vue.js!',
-	visibleHeaders: headerData,
-	rows: rowData,
-	searchCriteria: criteriaData,
-	table_styles: table_styles,
-	search_editor_styles: searchEditorStyles,
+  methods: {
+    onSearchTriggered: function (payload)
+    {
+      let buildConstraints = (criterias) => 
+      {
+        let sortedPriority = 
+          store.configCache.priority.sort((x, y) => { return x < y});
+        let fieldConstraintMakers = {
+          priority:{
+            higher_than: ((priority, val)=>
+            {
+              return {
+                key: 'priorities', 
+                val: priority.filter(x => x.val > val).map(x => x.val),
+              };
+            }).bind(undefined, sortedPriority),
+          },
+          project: {
+            belongs_to: ((val)=>
+            {
+              return {
+                key: 'priorities', 
+                val: val,
+              };
+            }),
+          },
+        };
+
+        let constraints = {};
+
+        for (let criteria of criterias)
+        {
+          try
+          {
+            let fieldConstraint =
+              fieldConstraintMakers[criteria.operate_on][criteria.operator](criteria.operand);
+            constraints[fieldConstraint.key] = fieldConstraint.val;
+          }
+          catch(ex)
+          {
+            console.log(ex.message);
+          }
+        }
+        return {constraints};
+      };// end of buildConstraints
+
+      let constraints = buildConstraints(payload);
+      messageCenter.publish({
+        type: kRequestSearchUpdate,
+        payload: constraints
+      });
+    },
+  },
+  data: function () {
+    return{
+      message: 'Hello Vue.js!',
+      visibleHeaders: headerData,
+      rows: rowData,
+      searchCriteria: criteriaData,
+      table_styles: table_styles,
+      search_editor_styles: searchEditorStyles,
+    };
   }
 })
 </script>
