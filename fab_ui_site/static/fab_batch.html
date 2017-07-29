@@ -66,7 +66,34 @@ new Vue({
             belongs_to: ((val)=>
             {
               return {
-                key: 'priorities', 
+                key: 'projects', 
+                val: val,
+              };
+            }),
+          },
+          author: {
+            belongs_to: ((val)=>
+            {
+              return {
+                key: 'authorPHIDs', 
+                val: val,
+              };
+            }),
+          },
+          assigned: {
+            belongs_to: ((val)=>
+            {
+              return {
+                key: 'assigned', 
+                val: val,
+              };
+            }),
+          },
+          status: {
+            belongs_to: ((val)=>
+            {
+              return {
+                key: 'statuses', 
                 val: val,
               };
             }),

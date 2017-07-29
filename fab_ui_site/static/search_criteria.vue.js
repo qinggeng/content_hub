@@ -15,6 +15,7 @@ const searchEditorStyles = {
 		'min-height': '40px',
 		'flex-direction': 'row',
     justifyContent: 'flex-start',
+    flexWrap: 'wrap',
 		'padding': '4px',
 	}),
 	criteria: {
@@ -60,7 +61,7 @@ const searchCriteriaTemplate = `
 		:current_view='"raw"'/>
 	<data_editor 
 		:raw_data='criteria.operand' 
-		:data_traits='current_field_trait || current_field.data_traits' 
+		:data_traits='current_field_trait || current_field.field_editors[criteria.operator].data_traits' 
 		:current_view='"raw"' @edited='onCriteriaChanged'/>
 	<!-- <span :style='styles.sector'>{{criteria.operand}}</span> -->
 	<div :style='styles.xbtn' @click='requestRemoveCriteria'>
@@ -265,7 +266,7 @@ const searchEditor =
     },
     onNewCriteria: function(ev) {
 			let newCriterias = s2j(j2s(this.criterias));
-      newCriterias.push({operator: 'contains', operand:'XXX', operate_on: 'title'});
+      newCriterias.splice(0, 0, {operator: 'contains', operand:'XXX', operate_on: 'title'});
 			this.criterias = newCriterias;
     },
 	},
