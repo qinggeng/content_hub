@@ -112,9 +112,34 @@ let field_criteria_defines = (() => {
           return this.data_traits.choices[0].val;
         }
         return val;
-      }
-,
+      },
     };
+    field_editors[predicts.lower_than.key] =
+    {
+      data_traits:
+      {
+        edit_type: 'choice',
+        editable: true,
+        update   : function(val){},
+        get choices() 
+        {
+          return store.configCache.priority;
+        },
+      },
+      apply_value: function(val) {
+        if (typeof val == 'Array')
+        {
+          val = Number(val[0]);
+        }
+        var filtered = this.data_traits.choices.filter(x=> x.val === val);
+        if (filtered.length == 0)
+        {
+          return this.data_traits.choices[0].val;
+        }
+        return val;
+      },
+    };
+
     return {
       name      : 'priority',
       display   : '优先级',

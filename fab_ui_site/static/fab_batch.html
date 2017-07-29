@@ -61,6 +61,20 @@ new Vue({
                 val: priority.filter(x => x.val > val).map(x => x.val),
               };
             }).bind(undefined, sortedPriority),
+            lower_than: ((priority, val)=>
+            {
+              return {
+                key: 'priorities', 
+                val: priority.filter(x => x.val < val).map(x => x.val),
+              };
+            }).bind(undefined, sortedPriority),
+            belongs_to: ((val)=>
+            {
+              return {
+                key: 'priorities', 
+                val: val,
+              };
+            }),
           },
           project: {
             belongs_to: ((val)=>
